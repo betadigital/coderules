@@ -57,3 +57,4 @@ For automated clients (bots, scripts, or other systems) that need backend access
 - All backend CAP services respect XSUAA scopes; ensure M2M clients have the required scope assigned.  
 - For frontend users, role assignments in the cockpit control CRUD access.  
 - Use the `m2m-key` for automated clients in your OAuth 2.0 **client credentials flow** to access backend APIs.
+- under `utils/dev_xs-app.json`, there is a development and production routing configuration file. Using the dev version allows you to run production environment tests with a real approuter and backend service instance. See https://cap.cloud.sap/docs/node.js/authentication#running-app-router for more information on how to do this.
