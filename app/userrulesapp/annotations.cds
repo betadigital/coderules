@@ -1,211 +1,204 @@
 using RuleService as service from '../../srv/rule-service';
+
 annotate service.CodeUsers with @(
-    UI.LineItem : [
+    UI.LineItem              : [
         {
-            $Type : 'UI.DataField',
-            Value : ID,
-            Label : 'ID',
+            $Type: 'UI.DataField',
+            Value: ID,
+            Label: 'ID',
         },
         {
-            $Type : 'UI.DataField',
-            Value : createdBy,
+            $Type: 'UI.DataField',
+            Value: createdBy,
         },
         {
-            $Type : 'UI.DataField',
-            Value : createdAt,
-        },
-    ],
-    UI.HeaderFacets : [
-        {
-            $Type : 'UI.ReferenceFacet',
-            Label : 'Admin Info',
-            ID : 'AdminInfo',
-            Target : '@UI.FieldGroup#AdminInfo',
+            $Type: 'UI.DataField',
+            Value: createdAt,
         },
     ],
+    UI.HeaderFacets          : [{
+        $Type : 'UI.ReferenceFacet',
+        Label : 'Admin Info',
+        ID    : 'AdminInfo',
+        Target: '@UI.FieldGroup#AdminInfo',
+    }, ],
     UI.FieldGroup #AdminInfo : {
-        $Type : 'UI.FieldGroupType',
+        $Type: 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Value : createdAt,
+                $Type: 'UI.DataField',
+                Value: createdAt,
             },
             {
-                $Type : 'UI.DataField',
-                Value : createdBy,
+                $Type: 'UI.DataField',
+                Value: createdBy,
             },
             {
-                $Type : 'UI.DataField',
-                Value : modifiedAt,
-                Label : 'Modified on',
+                $Type: 'UI.DataField',
+                Value: modifiedAt,
+                Label: 'Modified on',
             },
             {
-                $Type : 'UI.DataField',
-                Value : modifiedBy,
-                Label : 'Modified by',
+                $Type: 'UI.DataField',
+                Value: modifiedBy,
+                Label: 'Modified by',
             },
         ],
     },
-    UI.FieldGroup #AdminInfo1 : {
-        $Type : 'UI.FieldGroupType',
-        Data : [
-        ],
+    UI.FieldGroup #AdminInfo1: {
+        $Type: 'UI.FieldGroupType',
+        Data : [],
     },
-    UI.Facets : [
-        {
-            $Type : 'UI.ReferenceFacet',
-            Label : 'Rules',
-            ID : 'Rules',
-            Target : 'rules/@UI.LineItem#Rules',
-        },
-    ],
-    UI.HeaderInfo : {
-        TypeName : 'Code User',
-        TypeNamePlural : 'Code Users',
-        Description : {
-            $Type : 'UI.DataField',
-            Value : 'User page for a user with write-access to codebase',
+    UI.Facets                : [{
+        $Type : 'UI.ReferenceFacet',
+        Label : 'Rules',
+        ID    : 'Rules',
+        Target: 'rules/@UI.LineItem#Rules',
+    }, ],
+    UI.HeaderInfo            : {
+        TypeName      : 'Code User',
+        TypeNamePlural: 'Code Users',
+        Description   : {
+            $Type: 'UI.DataField',
+            Value: 'User page for a user with write-access to codebase',
         },
     },
 );
 
 annotate service.UserRules with @(
-    UI.LineItem #Rules : [
+    UI.LineItem #Rules                 : [
         {
-            $Type : 'UI.DataField',
-            Value : ID,
-            Label : 'InstanceID',
+            $Type: 'UI.DataField',
+            Value: ID,
+            Label: 'InstanceID',
+        },
+        {
+            $Type: 'UI.DataField',
+            Value: baseRule_ID,
+            Label: 'Rule Template ID',
         },
         {
             $Type : 'UI.DataField',
-            Value : baseRule_ID,
-            Label : 'Rule Template ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : baseRule.description,
+            Value : baseRule.ruleType.description,
             Label : 'Rule Description',
         },
         {
-            $Type : 'UI.DataField',
-            Value : effectiveDate,
-            Label : 'Date of effect',
+            $Type: 'UI.DataField',
+            Value: effectiveDate,
+            Label: 'Date of effect',
         },
         {
-            $Type : 'UI.DataField',
-            Value : endDate,
-            Label : 'Rule end date',
+            $Type: 'UI.DataField',
+            Value: endDate,
+            Label: 'Rule end date',
         },
     ],
-    UI.HeaderFacets : [
-        {
-            $Type : 'UI.ReferenceFacet',
-            Label : 'Admin Info',
-            ID : 'AdminInfo',
-            Target : '@UI.FieldGroup#AdminInfo',
-        },
-    ],
-    UI.FieldGroup #AdminInfo : {
-        $Type : 'UI.FieldGroupType',
+    UI.HeaderFacets                    : [{
+        $Type : 'UI.ReferenceFacet',
+        Label : 'Admin Info',
+        ID    : 'AdminInfo',
+        Target: '@UI.FieldGroup#AdminInfo',
+    }, ],
+    UI.FieldGroup #AdminInfo           : {
+        $Type: 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Value : ID,
-                Label : 'ID',
+                $Type: 'UI.DataField',
+                Value: ID,
+                Label: 'ID',
             },
             {
-                $Type : 'UI.DataField',
-                Value : createdBy,
+                $Type: 'UI.DataField',
+                Value: createdBy,
             },
             {
-                $Type : 'UI.DataField',
-                Value : createdAt,
+                $Type: 'UI.DataField',
+                Value: createdAt,
             },
             {
-                $Type : 'UI.DataField',
-                Value : modifiedAt,
+                $Type: 'UI.DataField',
+                Value: modifiedAt,
             },
             {
-                $Type : 'UI.DataField',
-                Value : modifiedBy,
+                $Type: 'UI.DataField',
+                Value: modifiedBy,
             },
         ],
     },
-    UI.Facets : [
+    UI.Facets                          : [
         {
             $Type : 'UI.ReferenceFacet',
             Label : 'Date Info',
-            ID : 'DateInfo',
-            Target : '@UI.FieldGroup#DateInfo',
+            ID    : 'DateInfo',
+            Target: '@UI.FieldGroup#DateInfo',
         },
         {
             $Type : 'UI.ReferenceFacet',
             Label : 'Base Rule Template Info',
-            ID : 'BaseRuleTemplateInfo',
-            Target : '@UI.FieldGroup#BaseRuleTemplateInfo',
+            ID    : 'BaseRuleTemplateInfo',
+            Target: '@UI.FieldGroup#BaseRuleTemplateInfo',
         },
     ],
-    UI.FieldGroup #DateInfo : {
-        $Type : 'UI.FieldGroupType',
+    UI.FieldGroup #DateInfo            : {
+        $Type: 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Value : effectiveDate,
-                Label : 'Date of effect',
+                $Type: 'UI.DataField',
+                Value: effectiveDate,
+                Label: 'Date of effect',
             },
             {
-                $Type : 'UI.DataField',
-                Value : endDate,
-                Label : 'Rule finish date',
+                $Type: 'UI.DataField',
+                Value: endDate,
+                Label: 'Rule finish date',
             },
         ],
     },
-    UI.FieldGroup #BaseRuleTemplateInfo : {
-        $Type : 'UI.FieldGroupType',
+    UI.FieldGroup #BaseRuleTemplateInfo: {
+        $Type: 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Value : baseRule_ID,
-                Label : 'Rule Template ID',
+                $Type: 'UI.DataField',
+                Value: baseRule_ID,
+                Label: 'Rule Template ID',
+            },
+            {
+                $Type: 'UI.DataField',
+                Value: baseRule.createdBy,
+                Label: 'Rule Author',
             },
             {
                 $Type : 'UI.DataField',
-                Value : baseRule.description,
+                Value : baseRule.ruleType.code,
+                Label : 'Rule Code',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : baseRule.ruleType.description,
                 Label : 'Rule Description',
             },
             {
                 $Type : 'UI.DataField',
-                Value : baseRule.objectType,
-                Label : 'ObjectType',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : baseRule.ruleType,
-                Label : 'RuleType',
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : baseRule.value,
-                Label : 'RuleTypeValue',
+                Label : 'Rule Value',
             },
             {
                 $Type : 'UI.DataField',
-                Value : baseRule.createdBy,
-                Label : 'Rule Author',
+                Value : baseRule.objectType,
+                Label : 'Object Type',
             },
         ],
     },
-    UI.HeaderInfo : {
-        TypeName : 'User Rule',
-        TypeNamePlural : 'User Rules',
-        Title : {
-            $Type : 'UI.DataField',
-            Value : baseRule.description,
+    UI.HeaderInfo                      : {
+        TypeName      : 'User Rule',
+        TypeNamePlural: 'User Rules',
+        Title         : {
+            $Type: 'UI.DataField',
+            Value: baseRule.ruleType.description
         },
-        Description : {
-            $Type : 'UI.DataField',
-            Value : 'Core code rule information',
+        Description   : {
+            $Type: 'UI.DataField',
+            Value: 'Core code rule information',
         },
     },
 );
-

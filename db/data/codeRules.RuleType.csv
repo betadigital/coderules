@@ -1,0 +1,5 @@
+code,description
+LINE_COUNT,Max line count
+LINE_WIDTH,Max line width 
+COMMAND,Disallowed command type
+

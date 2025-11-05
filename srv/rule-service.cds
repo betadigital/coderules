@@ -6,11 +6,51 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity BaseRules as projection on codeRules.BaseRule;
+    entity RuleTypes as
+        projection on codeRules.RuleType {
+            *
+        };
+
+    @Capabilities.InsertRestrictions.Insertable: false
+    @Capabilities.UpdateRestrictions.Updatable : false
+    @Capabilities.DeleteRestrictions.Deletable : false
+    entity BaseRules as
+        projection on codeRules.BaseRule {
+            ID,
+            objectType,
+            value,
+            ruleType.description as ruleType_description,
+            @(
+                Common.ValueListWithFixedValues: true,
+                Common.ValueList               : {
+                    CollectionPath: 'RuleTypes',
+                    Parameters    : [
+                        {
+                            // This parameter maps the key for saving
+                            $Type            : 'Common.ValueListParameterInOut',
+                            LocalDataProperty: 'ruleType_code',
+                            // The FK field on BaseRule
+                            ValueListProperty: 'code' // The key on RuleType
+                        },
+                        {
+                            // This parameter tells the dropdown what to *show*
+                            $Type            : 'Common.ValueListParameterDisplayOnly',
+                            ValueListProperty: 'description'
+                        }
+                    ]
+                }
+            ) ruleType : redirected to RuleTypes
+
+        };
 
     @odata.draft.enabled
+    @Common.Label: 'Code User'
     entity CodeUsers as
         projection on codeRules.CodeUser {
+            @(
+                Common.Label  : 'User ID / Name',
+                UI.Placeholder: 'Enter a new User ID/Name...'
+            )
             ID,
             modifiedAt,
             createdBy,
@@ -30,16 +70,23 @@ service RuleService @(path: '/codeRuleService') {
             endDate,
 
             @(Common.ValueList: {
-                entity    : 'BaseRules',
-                parameters: [
+                CollectionPath: 'BaseRules',
+                Parameters    : [
                     {
+                        // This maps the key for saving
                         $Type            : 'Common.ValueListParameterInOut',
-                        LocalDataProperty: 'baseRule',
+                        LocalDataProperty: 'baseRule_ID',
                         ValueListProperty: 'ID'
                     },
                     {
+                        // First display column
                         $Type            : 'Common.ValueListParameterDisplayOnly',
-                        ValueListProperty: 'description'
+                        ValueListProperty: 'ruleType_description'
+                    },
+                    {
+                        // Second display column
+                        $Type            : 'Common.Value_ListParameterDisplayOnly',
+                        ValueListProperty: 'value'
                     }
                 ]
             })
@@ -51,10 +98,9 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    function getApplicableRules(userId: String)      returns array of UserRules;
+    function getApplicableRules(userId: String)   returns array of UserRules;
 
-    action   checkForOverdueRules(userId: String)    returns String;
+    action   checkForOverdueRules(userId: String) returns String;
 
-    
 
 }

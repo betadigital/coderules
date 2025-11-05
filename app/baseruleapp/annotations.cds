@@ -8,8 +8,8 @@ annotate service.BaseRules with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : description,
-            Label : 'Rule Description',
+            Value : ruleType.description,
+            Label : '{i18n>RuleDescription}',
         },
         {
             $Type : 'UI.DataField',
@@ -18,22 +18,17 @@ annotate service.BaseRules with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : ruleType,
-            Label : 'Rule Type',
+            Value : ruleType_code,
+            Label : '{i18n>RuleType}',
         },
         {
             $Type : 'UI.DataField',
-            Value : value,
-            Label : 'Rule Value',
+            Value : Author,
+            Label : 'Author',
         },
         {
             $Type : 'UI.DataField',
             Value : createdAt,
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : createdBy,
-            Label : '{i18n>Author}',
         },
     ],
     UI.Facets : [
@@ -49,18 +44,18 @@ annotate service.BaseRules with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Value : description,
+                Value : ruleType_code,
+                Label : 'Rule Code',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : ruleType.description,
                 Label : '{i18n>RuleDescription}',
             },
             {
                 $Type : 'UI.DataField',
                 Value : objectType,
                 Label : 'Object Type',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : ruleType,
-                Label : 'Rule Type',
             },
             {
                 $Type : 'UI.DataField',
@@ -94,10 +89,6 @@ annotate service.BaseRules with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Value : createdBy,
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : createdAt,
             },
             {
@@ -106,7 +97,11 @@ annotate service.BaseRules with @(
             },
             {
                 $Type : 'UI.DataField',
-                Value : modifiedBy,
+                Value : Author,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : EditedBy,
             },
         ],
     },

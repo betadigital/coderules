@@ -12,16 +12,28 @@ using {
     value
 ]}
 entity BaseRule : cuid, managed {
-    description : String(100);
-    objectType  : String(10);
-    ruleType    : String(20);
-    value       : String(50);
+    @mandatory
+    objectType : String(10);
+
+    @mandatory
+    ruleType   : Association to one RuleType;
+    @mandatory
+    value      : String(50);
+}
+
+entity RuleType {
+    key code        : String(30);
+        description : String(100)
 }
 
 entity UserRule : managed {
     key ID            : UUID;
         baseRule      : Association to one BaseRule;
+
+        @mandatory
         effectiveDate : Date;
+
+        @mandatory
         endDate       : Date;
         user          : Association to one CodeUser;
 }

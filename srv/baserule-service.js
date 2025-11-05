@@ -8,7 +8,7 @@ module.exports = (srv) => {
         // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
         console.log(`[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${req.target ? req.target.name : 'unknown'}`);
         if (req.user) {
-            console.log("User credentials detected on HTTP request. See below:\nID: ", req.user.id, "\nRoles: ", req.user.roles, "\nAttr: ", req.user.attr);
+            console.log("User credentials detected on HTTP request. See below:\nID: ", req.user.id, "\nRoles: ", req.user.roles);
         }
         else {
             console.log("Unauthenticated request received...");
@@ -17,32 +17,98 @@ module.exports = (srv) => {
 
 
 
+
+
+
+    // --- Your Event Handlers ---
+
+    // 1. Your REFACTORED 'CREATE' handler
     srv.before('CREATE', 'BaseRules', async (req) => {
+        const { objectType, ruleType_code, value } = req.data;
 
-        const { objectType, ruleType, value } = req.data;
-
-        // Validate required fields (optional but recommended)
-        if (!objectType || !ruleType || !value) {
-            return req.error(400, 'objectType, ruleType and value are required fields.');
+        // A. Validate required fields
+        if (!objectType || !ruleType_code || value == null) {
+            return req.error(400, 'objectType, ruleType_code, and value are required fields.');
         }
 
-        // Check uniqueness
-        const result = await SELECT.one.from(BaseRules)
+        // B. Run the rule-specific logic validation
+        const logicError = validateRuleData(req.data);
+        if (logicError) {
+            return req.error(logicError.code, logicError.message);
+        }
+
+        // C. Check uniqueness
+        const duplicate = await SELECT.one.from(BaseRules)
             .where({
                 objectType,
-                ruleType,
+                ruleType_code,
                 value
             });
 
-        if (result) {
+        if (duplicate) {
             return req.error(
                 409,
-                `A rule already exists with the same objectType (${objectType}), ruleType (${ruleType}) and value (${value}). Existing ID: ${result.ID}`
+                `A rule already exists with the same objectType (${objectType}), ruleType (${ruleType_code}) and value (${value}). Existing ID: ${duplicate.ID}`
             );
         }
 
         // Otherwise allow create
     });
+
+
+    srv.before('UPDATE', 'BaseRules', async (req) => {
+
+        // 1. Get the key object of the record being updated, e.g., { ID: '...' }
+        const key = req.params[0]; // Renamed from ruleId for clarity
+        //
+        try {
+
+            const existingData = await SELECT.one.from(BaseRules).where(key);
+
+            if (!existingData) {
+                // Use key.ID to get the actual UUID string for the error message
+                return req.error(404, `Rule with ID ${key.ID} not found.`);
+            }
+
+            // 3. Create the 'final state' by merging existing data with incoming data.
+            const mergedData = { ...existingData, ...req.data };
+
+            // 4. Run the rule-specific logic validation on the *merged* data.
+            const logicError = validateRuleData(mergedData); // (This calls your helper function)
+            if (logicError) {
+                return req.error(logicError.code, logicError.message);
+            }
+
+            // 5. Check uniqueness (only if a relevant field is being changed)
+            const { objectType, ruleType_code, value } = req.data;
+            if (objectType || ruleType_code || value != null) {
+
+                const duplicate = await SELECT.one.from(BaseRules)
+                    .where({
+                        objectType: mergedData.objectType,
+                        ruleType_code: mergedData.ruleType_code,
+                        value: mergedData.value,
+                        ID: { '!=': key.ID }
+                    });
+
+                if (duplicate) {
+                    return req.error(
+                        409,
+                        `An update would cause a conflict. A rule already exists with objectType (${mergedData.objectType}), ruleType (${mergedData.ruleType_code}) and value (${mergedData.value}). Existing ID: ${duplicate.ID}`
+                    );
+                }
+            }
+
+            // Otherwise allow update
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
+    });
+
 
     srv.on('fileUploadBaseRules', async (req) => {
         console.log("CP1");
@@ -117,5 +183,50 @@ module.exports = (srv) => {
             return req.error(500, `Failed to upload rules: ${err.message}`);
         }
     });
+
+
+    // --- Helper Function ---
+    // This function validates the 'final state' of a rule.
+    function validateRuleData(data) {
+        const { ruleType_code, value } = data;
+
+        // Check for null/undefined. An empty string is a valid 'value'.
+        if (value == null) {
+            // This check is mainly for 'CREATE'.
+            // In 'UPDATE', 'mergedData' will always have a value.
+            return { code: 400, message: 'The "value" field cannot be null.' };
+        }
+
+        switch (ruleType_code) {
+            case 'COMMAND':
+                // Must be alphabetical. We use a regex to check.
+                const alphaRegex = /^[a-zA-Z]+$/;
+                if (!alphaRegex.test(value)) {
+                    return {
+                        code: 400,
+                        message: `Rule type 'COMMAND' requires a purely alphabetical value. Received: '${value}'`
+                    };
+                }
+                break;
+
+            case 'LINE_WIDTH':
+            case 'LINE_COUNT':
+                // Must be numeric and greater than 0
+                const numValue = Number(value);
+                if (isNaN(numValue) || numValue <= 0) {
+                    return {
+                        code: 400,
+                        message: `Rule type '${ruleType_code}' requires a numeric value greater than 0. Received: '${value}'`
+                    };
+                }
+                break;
+
+            default:
+                // No specific validation for other types
+                break;
+        }
+
+        return null; // No errors
+    }
 
 }
