@@ -4,13 +4,13 @@
         {
             "source": "^/baseruleapp/(.*)$",
             "target": "$1",
-            "localDir": "app/baseruleapp/webapp",
+            "localDir": "../baseruleapp/webapp",
             "authenticationType": "xsuaa"
         },
         {
             "source": "^/userrulesapp/(.*)$",
             "target": "$1",
-            "localDir": "app/userrulesapp/webapp",
+            "localDir": "../userrulesapp/webapp",
             "authenticationType": "xsuaa"
         },
         {
