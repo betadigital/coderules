@@ -1,7 +1,7 @@
 _schema-version: 3.3.0
 ID: code-review-rules
 version: 1.0.0
-description: "CAP Project with Fiori Frontend and Full AuthZ/AuthN"
+description: "A simple CAP project."
 parameters:
   enable-parallel-deployments: true
   deploy_mode: html5-repo
@@ -11,7 +11,6 @@ build-parameters:
       commands:
         - npm ci
         - npx cds build --production
-
 modules:
   - name: code-review-rules-srv
     type: nodejs
@@ -22,7 +21,7 @@ modules:
     build-parameters:
       builder: npm-ci
     provides:
-      - name: srv-api
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
         properties:
           srv-url: ${default-url}
     requires:
@@ -49,21 +48,21 @@ modules:
       - name: srv-api
         group: destinations
         properties:
-          name: srv-api
+          name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
       - name: code-review-rules-auth
       - name: code-review-rules-destination
-      - name: code-review-rules-html5-runtime
+      - name: code-review-rules-html5-runtime # <-- Changed from repo-host
     provides:
       - name: app-api
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
 
-  - name: code-review-rules-app-deployer
+  - name: code-review-rules-app-deployer # <-- Renamed for clarity
     type: com.sap.application.content
-    path: .
+    path: . # <-- Changed path to root for build artifacts
     parameters:
       app-config:
         overwrite: true
@@ -72,16 +71,16 @@ modules:
         parameters:
           content-target: true
     build-parameters:
-      build-result: resources
+      build-result: resources # <-- This points to the folder created by mbt
       requires:
         - name: codereviewrulesbaseruleapp
           artifacts:
             - baseruleapp.zip
-          target-path: resources/
+          target-path: resources/ # <-- This is the subfolder in the build-result
         - name: codereviewrulesuserrulesapp
           artifacts:
             - userrulesapp.zip
-          target-path: resources/
+          target-path: resources/ # <-- This is the subfolder in the build-result
 
   - name: codereviewrulesbaseruleapp
     type: html5
@@ -93,7 +92,6 @@ modules:
         - npm ci
         - npm run build
       supported-platforms: []
-
   - name: codereviewrulesuserrulesapp
     type: html5
     path: app/userrulesapp
@@ -112,6 +110,7 @@ resources:
     parameters:
       service: xsuaa
       service-plan: application
+      service-name: code-rules-xsuaa # <-- Binds to existing service
       path: ./xs-security.json
       config:
         tenant-mode: dedicated
@@ -141,30 +140,34 @@ resources:
     requires:
       - name: app-api
 
-  # HDI Container (HANA)
+  # HDI Container pointing to your existing instance
   - name: code-review-rules-db
-    type: org.cloudfoundry.managed-service
+    type: org.cloudfoundry.managed-service # <-- Changed from com.sap.xs.hdi-container
     parameters:
       service: hana
       service-plan: hdi-shared
+      service-name: code-review-rules-db # <-- Binds to existing service
 
-  # Destination Service
+  # Destination Service (creates a new one, as it's 'lite')
   - name: code-review-rules-destination
     type: org.cloudfoundry.managed-service
     parameters:
       service: destination
       service-plan: lite
+      service-name: destination-service
 
-  # HTML5 Repo Host
+  # HTML5 Repo Host (creates a new one)
   - name: code-review-rules-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
 
-  # HTML5 Repo Runtime
+  # HTML5 Repo Runtime pointing to your existing instance
   - name: code-review-rules-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
+      service-name: html5-app-runtime # <-- Binds to existing service
+
