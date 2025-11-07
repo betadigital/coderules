@@ -1,4 +1,4 @@
-using BaseRuleService as service from '../../srv/baserule-service';
+using BaseRuleService as service from '../../../srv/baserule-service';
 annotate service.BaseRules with @(
     UI.LineItem : [
         {

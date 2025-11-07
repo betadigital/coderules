@@ -1,7 +1,7 @@
 {
   "_version": "1.76.0",
   "sap.app": {
-    "id": "userrulesapp",
+    "id": "codereviewrules.baseruleapp",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -13,11 +13,11 @@
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
       "version": "1.19.3",
-      "toolsId": "f733cede-6d83-4801-a7cb-32c62ae40f51"
+      "toolsId": "89134afb-3a08-46be-a9ae-5cc76c451671"
     },
     "dataSources": {
       "mainService": {
-        "uri": "/codeRuleService/",
+        "uri": "/baseRuleService/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -61,7 +61,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "userrulesapp.i18n.i18n"
+          "bundleName": "codereviewrules.baseruleapp.i18n.i18n"
         }
       },
       "": {
@@ -85,49 +85,40 @@
       "config": {
         "flexibleColumnLayout": {
           "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
-          "defaultThreeColumnLayoutType": "ThreeColumnsMidExpanded"
+          "defaultThreeColumnLayoutType": "ThreeColumnsEndExpanded"
         },
         "routerClass": "sap.f.routing.Router"
       },
       "routes": [
         {
           "pattern": ":?query:",
-          "name": "CodeUsersList",
+          "name": "BaseRulesList",
           "target": [
-            "CodeUsersList"
+            "BaseRulesList"
           ]
         },
         {
-          "pattern": "CodeUsers({key}):?query:",
-          "name": "CodeUsersObjectPage",
+          "pattern": "BaseRules({key}):?query:",
+          "name": "BaseRulesObjectPage",
           "target": [
-            "CodeUsersList",
-            "CodeUsersObjectPage"
-          ]
-        },
-        {
-          "pattern": "CodeUsers({key})/rules({key2}):?query:",
-          "name": "UserRulesObjectPage",
-          "target": [
-            "CodeUsersList",
-            "CodeUsersObjectPage",
-            "UserRulesObjectPage"
+            "BaseRulesList",
+            "BaseRulesObjectPage"
           ]
         }
       ],
       "targets": {
-        "CodeUsersList": {
+        "BaseRulesList": {
           "type": "Component",
-          "id": "CodeUsersList",
+          "id": "BaseRulesList",
           "name": "sap.fe.templates.ListReport",
           "options": {
             "settings": {
-              "contextPath": "/CodeUsers",
+              "contextPath": "/BaseRules",
               "variantManagement": "Page",
               "navigation": {
-                "CodeUsers": {
+                "BaseRules": {
                   "detail": {
-                    "route": "CodeUsersObjectPage"
+                    "route": "BaseRulesObjectPage"
                   }
                 }
               },
@@ -135,6 +126,15 @@
                 "@com.sap.vocabularies.UI.v1.LineItem": {
                   "tableSettings": {
                     "type": "ResponsiveTable"
+                  },
+                  "actions": {
+                    "ruleCsvUpload": {
+                      "press": "codereviewrules.baseruleapp.ext.controller.CSV_Uploader.uploadCSV",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "Import Rules (CSV)"
+                    }
                   }
                 }
               }
@@ -143,38 +143,18 @@
           "controlAggregation": "beginColumnPages",
           "contextPattern": ""
         },
-        "CodeUsersObjectPage": {
+        "BaseRulesObjectPage": {
           "type": "Component",
-          "id": "CodeUsersObjectPage",
+          "id": "BaseRulesObjectPage",
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
               "editableHeaderContent": false,
-              "contextPath": "/CodeUsers",
-              "navigation": {
-                "rules": {
-                  "detail": {
-                    "route": "UserRulesObjectPage"
-                  }
-                }
-              }
+              "contextPath": "/BaseRules"
             }
           },
           "controlAggregation": "midColumnPages",
-          "contextPattern": "/CodeUsers({key})"
-        },
-        "UserRulesObjectPage": {
-          "type": "Component",
-          "id": "UserRulesObjectPage",
-          "name": "sap.fe.templates.ObjectPage",
-          "options": {
-            "settings": {
-              "editableHeaderContent": false,
-              "contextPath": "/CodeUsers/rules"
-            }
-          },
-          "controlAggregation": "endColumnPages",
-          "contextPattern": "/CodeUsers({key})/rules({key2})"
+          "contextPattern": "/BaseRules({key})"
         }
       }
     },

@@ -1,3 +1,3 @@
-using from './baseruleapp/annotations';
+using from './codereviewrules/baseruleapp/annotations';
 
-using from './userrulesapp/annotations';
+using from './codereviewrules/userrulesapp/annotations';

@@ -47,6 +47,14 @@ annotate RuleService.BaseRules with @(restrict: [{
     ]
 }]);
 
+annotate RuleService.RuleTypes with @(restrict: [{
+    grant: 'READ',
+    to   : [
+        'RuleAdmin',
+        'RuleCreator'
+    ]
+}]);
+
 
 annotate RuleService.checkForOverdueRules with @(requires: ['RuleAdmin']);
 

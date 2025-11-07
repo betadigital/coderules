@@ -1,4 +1,4 @@
-using RuleService as service from '../../srv/rule-service';
+using RuleService as service from '../../../srv/rule-service';
 
 annotate service.CodeUsers with @(
     UI.LineItem              : [
@@ -78,9 +78,9 @@ annotate service.UserRules with @(
             Label: 'Rule Template ID',
         },
         {
-            $Type : 'UI.DataField',
-            Value : baseRule.ruleType.description,
-            Label : 'Rule Description',
+            $Type: 'UI.DataField',
+            Value: baseRule.ruleType.description,
+            Label: 'Rule Description',
         },
         {
             $Type: 'UI.DataField',
@@ -168,24 +168,24 @@ annotate service.UserRules with @(
                 Label: 'Rule Author',
             },
             {
-                $Type : 'UI.DataField',
-                Value : baseRule.ruleType.code,
-                Label : 'Rule Code',
+                $Type: 'UI.DataField',
+                Value: baseRule.ruleType.code,
+                Label: 'Rule Code',
             },
             {
-                $Type : 'UI.DataField',
-                Value : baseRule.ruleType.description,
-                Label : 'Rule Description',
+                $Type: 'UI.DataField',
+                Value: baseRule.ruleType.description,
+                Label: 'Rule Description',
             },
             {
-                $Type : 'UI.DataField',
-                Value : baseRule.value,
-                Label : 'Rule Value',
+                $Type: 'UI.DataField',
+                Value: baseRule.value,
+                Label: 'Rule Value',
             },
             {
-                $Type : 'UI.DataField',
-                Value : baseRule.objectType,
-                Label : 'Object Type',
+                $Type: 'UI.DataField',
+                Value: baseRule.objectType,
+                Label: 'Object Type',
             },
         ],
     },

@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: code-review-rules
-version: 1.0.0
+version: 1.1.0
 description: "A simple CAP project."
 parameters:
   enable-parallel-deployments: true
@@ -25,7 +25,7 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
-      - name: code-review-rules-auth
+      - name: code-rules-xsuaa
       - name: code-review-rules-db
       - name: code-review-rules-destination
 
@@ -51,7 +51,7 @@ modules:
           name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: code-review-rules-auth
+      - name: code-rules-xsuaa
       - name: code-review-rules-destination
       - name: code-review-rules-html5-runtime # <-- Changed from repo-host
     provides:
@@ -105,38 +105,10 @@ modules:
 
 resources:
   # XSUAA Service pointing to your existing instance
-  - name: code-review-rules-auth
-    type: org.cloudfoundry.managed-service
+  - name: code-rules-xsuaa
+    type: org.cloudfoundry.existing-service
     parameters:
-      service: xsuaa
-      service-plan: application
       service-name: code-rules-xsuaa # <-- Binds to existing service
-      path: ./xs-security.json
-      config:
-        tenant-mode: dedicated
-        xsappname: code-review-rules
-        oauth2-configuration:
-          redirect-uris:
-            - https://*.cfapps.*.hana.ondemand.com/login/callback # Generic callback
-            - https://*.${default-domain}/login/callback
-            - https://*~{app-api/app-uri}/**
-        role-collections:
-          - name: "RuleAdmin (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleAdmin"
-          - name: "RuleReader (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleReader"
-          - name: "RuleCreator (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleCreator"
-          - name: "RuleM2M (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleM2m"
     requires:
       - name: app-api
 

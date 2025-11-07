@@ -1,51 +1,32 @@
 {
-  "welcomeFile": "/index.html",
   "routes": [
-    {
-      "source": "^/baseruleapp/(.*)$",
-      "target": "/$1",
-      "destination": "baseruleapp",
-      "authenticationType": "xsuaa",
-      "csrfProtection": false
-    },
-    {
-      "source": "^/userrulesapp/(.*)$",
-      "target": "/$1",
-      "destination": "userrulesapp",
-      "authenticationType": "xsuaa",
-      "csrfProtection": false
-    },
-    {
-      "source": "^/resources/(.*)$",
-      "target": "/resources/$1",
-      "authenticationType": "none",
-      "destination": "sapui5"
-    },
-    {
-      "source": "^/test-resources/(.*)$",
-      "target": "/test-resources/$1",
-      "authenticationType": "none",
-      "destination": "sapui5"
-    },
     {
       "source": "^/codeRuleService/(.*)$",
       "target": "/codeRuleService/$1",
       "destination": "srv-api",
-      "authenticationType": "none",
+      "authenticationType": "xsuaa",
       "csrfProtection": false
     },
     {
       "source": "^/baseRuleService/(.*)$",
       "target": "/baseRuleService/$1",
       "destination": "srv-api",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/api/baseRuleService/(.*)$",
+      "target": "/baseRuleService/$1",
+      "destination": "srv-api",
       "authenticationType": "none",
       "csrfProtection": false
     },
     {
-      "source": "^/(.*)$",
-      "target": "$1",
-      "localDir": "webapp",
-      "authenticationType": "xsuaa"
+      "source": "^/api/codeRuleService/(.*)$",
+      "target": "/codeRuleService/$1",
+      "destination": "srv-api",
+      "authenticationType": "none",
+      "csrfProtection": false
     }
   ]
 }

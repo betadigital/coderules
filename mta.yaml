@@ -1,7 +1,7 @@
 _schema-version: 3.3.0
 ID: code-review-rules
-version: 1.0.0
-description: "CAP Project with Fiori Frontend and Full AuthZ/AuthN"
+version: 1.2.0
+description: "CAP project with 2 Fiori frontends, backend API, and HTML5 repo deployment."
 parameters:
   enable-parallel-deployments: true
   deploy_mode: html5-repo
@@ -13,6 +13,7 @@ build-parameters:
         - npx cds build --production
 
 modules:
+  # Backend CAP service
   - name: code-review-rules-srv
     type: nodejs
     path: gen/srv
@@ -26,10 +27,11 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
-      - name: code-review-rules-auth
+      - name: code-rules-xsuaa
       - name: code-review-rules-db
       - name: code-review-rules-destination
 
+  # HDI deployer
   - name: code-review-rules-db-deployer
     type: hdb
     path: gen/db
@@ -38,7 +40,8 @@ modules:
     requires:
       - name: code-review-rules-db
 
-  - name: code-review-rules
+  # Approuter for backend routing only
+  - name: code-review-rules-approuter
     type: approuter.nodejs
     path: app/router
     parameters:
@@ -52,7 +55,7 @@ modules:
           name: srv-api
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: code-review-rules-auth
+      - name: code-rules-xsuaa
       - name: code-review-rules-destination
       - name: code-review-rules-html5-runtime
     provides:
@@ -61,7 +64,32 @@ modules:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
 
-  - name: code-review-rules-app-deployer
+  # HTML5 frontend: baseruleapp
+  - name: codereviewrules-baseruleapp
+    type: html5
+    path: app/codereviewrules/baseruleapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build
+      supported-platforms: []
+
+  # HTML5 frontend: userrulesapp
+  - name: codereviewrules-userrulesapp
+    type: html5
+    path: app/codereviewrules/userrulesapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build
+      supported-platforms: []
+
+  # HTML5 repo deployer for both frontends
+  - name: code-review-rules-html5-deployer
     type: com.sap.application.content
     path: .
     parameters:
@@ -74,97 +102,50 @@ modules:
     build-parameters:
       build-result: resources
       requires:
-        - name: codereviewrulesbaseruleapp
+        - name: codereviewrules-baseruleapp
           artifacts:
             - baseruleapp.zip
-          target-path: resources/
-        - name: codereviewrulesuserrulesapp
+          target-path: ./resources/
+        - name: codereviewrules-userrulesapp
           artifacts:
             - userrulesapp.zip
-          target-path: resources/
-
-  - name: codereviewrulesbaseruleapp
-    type: html5
-    path: app/baseruleapp
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm ci
-        - npm run build
-      supported-platforms: []
-
-  - name: codereviewrulesuserrulesapp
-    type: html5
-    path: app/userrulesapp
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm ci
-        - npm run build
-      supported-platforms: []
-
+          target-path: ./resources/
 resources:
-  # XSUAA Service pointing to your existing instance
-  - name: code-review-rules-auth
-    type: org.cloudfoundry.managed-service
+  # XSUAA: existing service
+  - name: code-rules-xsuaa
+    type: org.cloudfoundry.existing-service
     parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        tenant-mode: dedicated
-        xsappname: code-review-rules
-        oauth2-configuration:
-          redirect-uris:
-            - https://*.cfapps.*.hana.ondemand.com/login/callback # Generic callback
-            - https://*.${default-domain}/login/callback
-            - https://*~{app-api/app-uri}/**
-        role-collections:
-          - name: "RuleAdmin (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleAdmin"
-          - name: "RuleReader (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleReader"
-          - name: "RuleCreator (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleCreator"
-          - name: "RuleM2M (code-review-rules ${org}-${space})"
-            description: "generated"
-            role-template-references:
-              - "$XSAPPNAME.RuleM2m"
+      service-name: code-rules-xsuaa
     requires:
       - name: app-api
 
-  # HDI Container (HANA)
+  # HDI: existing service
   - name: code-review-rules-db
     type: org.cloudfoundry.managed-service
     parameters:
       service: hana
       service-plan: hdi-shared
+      service-name: code-review-rules-db
 
-  # Destination Service
+  # Destination service (new)
   - name: code-review-rules-destination
     type: org.cloudfoundry.managed-service
     parameters:
       service: destination
       service-plan: lite
+      service-name: destination-service
 
-  # HTML5 Repo Host
+  # HTML5 Repo host (new)
   - name: code-review-rules-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
 
-  # HTML5 Repo Runtime
+  # HTML5 Repo runtime: existing
   - name: code-review-rules-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
+      service-name: html5-app-runtime
