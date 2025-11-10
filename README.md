@@ -52,6 +52,39 @@ For automated clients (bots, scripts, or other systems) that need backend access
 
 ---
 
+**⚙️ Creating an API Destination**
+----------------------------------
+
+To make it easy for other BTP services (like an automation script, an Integration Suite flow, or another app) to call your application's API, you should create a Destination. This securely stores all the connection and authentication details in one place.
+
+1.  Navigate to DestinationsIn your BTP Subaccount, go to Connectivity → Destinations.
+    
+2.  Create a New DestinationClick New Destination and fill in the fields as follows:
+    
+
+*   **Name:** code-review-rules-Destination
+    
+*   **Type:** HTTP
+    
+*   **URL:** This is the API endpoint of your deployed CAP service.You can find this URL by checking the service instance for your app (e.g., code-review-rules). It’s the base URL you visit the app from in this case.
+    
+*   **Proxy Type:** Internet
+    
+*   **Authentication:** OAuth2ClientCredentials
+    
+
+1.  Add Authentication DetailsThese details come directly from the m2m-key you created in the previous section.Note\*\*: Copy these fields WITHOUT the enclosing quotation marks.
+    
+
+*   **Client ID:** Copy the clientid from your m2m-key JSON.
+    
+*   **Client Secret:** Copy the clientsecret from your m2m-key JSON.
+    
+*   **Token Service URL:** Copy the url from your m2m-key JSON and add /oauth/token to the end of it.**Example:** https://your-subaccount.authentication.eu10.hana.ondemand.com/oauth/token
+    
+
+Save and CheckSave the destination. You can use the Check Connection button to verify that BTP can successfully fetch an OAuth token using the credentials you provided.
+
 ## Notes
 
 - All backend CAP services respect XSUAA scopes; ensure M2M clients have the required scope assigned.  
