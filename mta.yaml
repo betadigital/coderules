@@ -125,7 +125,6 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
-      service-name: code-review-rules-db
 
   # Destination service (new)
   - name: code-review-rules-destination
@@ -133,7 +132,6 @@ resources:
     parameters:
       service: destination
       service-plan: lite
-      service-name: destination-service
 
   # HTML5 Repo host (new)
   - name: code-review-rules-html5-repo-host
@@ -148,4 +146,3 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
-      service-name: html5-app-runtime

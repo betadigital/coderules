@@ -61,6 +61,11 @@ annotate RuleService.checkForOverdueRules with @(requires: ['RuleAdmin']);
 annotate RuleService.getApplicableRules with @(requires: [
     'RuleReader',
     'RuleAdmin',
-    'RuleCreator',
+    'RuleM2M'
+]);
+
+annotate RuleService.getAllRules with @(requires: [
+    'RuleReader',
+    'RuleAdmin',
     'RuleM2M'
 ]);

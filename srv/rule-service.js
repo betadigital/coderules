@@ -15,13 +15,58 @@ module.exports = (srv) => {
         }
     });
 
+    /**
+     * Reusable query to get all user rule data with nested associations.
+     * We will flatten this result in our functions.
+     */
+    const _buildSelectQuery = () => {
+        return SELECT.from(UserRules, r => {
+            r.effectiveDate,
+                r.endDate,
+                r.baseRule(b => {
+                    b.ID,
+                        b.objectType,
+                        b.value,
+                        b.ruleType(rt => {
+                            rt.code,
+                                rt.description
+                        })
+                })
+        });
+    };
 
     /**
-     * Get all rules that are currently active for a user.
-     * (Current date is between effectiveDate and endDate)
-     *
-     * This implementation returns a JSON string of the UserRules array
-     * to match the "returns String" service definition.
+     * Reusable function to flatten the query result.
+     */
+    const _flattenRules = (rules) => {
+        if (!rules || rules.length === 0) {
+            return [];
+        }
+
+        return rules.map(rule => {
+            // Handle cases where baseRule or ruleType might be null
+            const baseRule = rule.baseRule || {};
+            const ruleType = baseRule.ruleType || {};
+
+            return {
+                effectiveDate: rule.effectiveDate,
+                endDate: rule.endDate,
+                baseRule_ID: baseRule.ID,
+                baseRule_objectType: baseRule.objectType,
+                baseRule_value: baseRule.value,
+                baseRule_ruleType_code: ruleType.code,
+                baseRule_ruleType_description: ruleType.description
+            };
+        });
+    };
+
+
+
+    /**
+         * Get all rules that are currently active for a user.
+         * (Current date is between effectiveDate and endDate)
+         *
+         * This implementation returns a flatten json string array.
      */
     srv.on('getApplicableRules', async (req) => {
         const { userId } = req.data;
@@ -29,28 +74,50 @@ module.exports = (srv) => {
             return req.error(400, 'User ID is required');
         }
 
-        // Use the new transaction signature cds.tx(req)
         const tx = cds.tx(req);
-        // Get today's date in 'YYYY-MM-DD' format for comparison
         const today = new Date().toISOString().split('T')[0];
 
-        // Use SELECT.from on the service projection 'UserRules'
-        const activeRules = await tx.run(
-            SELECT.from(UserRules, r => {
-                r`.*`, // Select all fields from UserRule
-                    r.baseRule(b => b`.*`) // Expand the baseRule association
-            })
-                .where({
-                    user_ID: userId,       // Filter by the user (string ID)
-                    and: {
-                        effectiveDate: { '<=': today }, // and today is on or after the start date
-                        endDate: { '>=': today }        // and today is on or before the end date
-                    }
-                })
-        );
+        // 1. Build the base query
+        const query = _buildSelectQuery();
 
-        // Return as a JSON string to match the service definition
-        return activeRules;
+        // 2. Add the WHERE clause for this function
+        query.where({
+            user_ID: userId,
+            and: {
+                effectiveDate: { '<=': today },
+                endDate: { '>=': today }
+            }
+        });
+
+        // 3. Run the query
+        const activeRulesResult = await tx.run(query);
+
+        // 4. Flatten the result using the map helper
+        return _flattenRules(activeRulesResult);
+    });
+
+    /**
+     * Get all rules assigned to a user, regardless of date.
+     */
+    srv.on('getAllRules', async (req) => {
+        const { userId } = req.data;
+        if (!userId) {
+            return req.error(400, 'User ID is required');
+        }
+
+        const tx = cds.tx(req);
+
+        // 1. Build the base query
+        const query = _buildSelectQuery();
+
+        // 2. Add the WHERE clause for this function
+        query.where({ user_ID: userId });
+
+        // 3. Run the query
+        const allRulesResult = await tx.run(query);
+
+        // 4. Flatten the result using the map helper
+        return _flattenRules(allRulesResult);
     });
 
     /**

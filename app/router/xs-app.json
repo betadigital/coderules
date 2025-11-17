@@ -4,14 +4,14 @@
       "source": "^/codeRuleService/(.*)$",
       "target": "/codeRuleService/$1",
       "destination": "srv-api",
-      "authenticationType": "xsuaa",
+      "authenticationType": "none",
       "csrfProtection": false
     },
     {
       "source": "^/baseRuleService/(.*)$",
       "target": "/baseRuleService/$1",
       "destination": "srv-api",
-      "authenticationType": "xsuaa",
+      "authenticationType": "none",
       "csrfProtection": false
     },
     {
