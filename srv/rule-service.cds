@@ -2,6 +2,17 @@ using {codeRules} from '../db/schema';
 
 service RuleService @(path: '/codeRuleService') {
 
+    // Define the new, flat return type
+    type SimpleRule {
+        baserule_ID         : String;
+        baserule_objectType : String;
+        baserule_ruletype   : String; // This will hold the RuleType.code
+        baserule_value      : String;
+        effectiveDate       : Date;
+        endDate             : Date;
+        user_ID             : String;
+    }
+
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
@@ -98,7 +109,9 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    function getApplicableRules(userId: String)   returns array of UserRules;
+    function getApplicableRules(userId: String)   returns array of SimpleRule;
+
+    function getAllRules(userId: String)          returns array of SimpleRule;
 
     action   checkForOverdueRules(userId: String) returns String;
 

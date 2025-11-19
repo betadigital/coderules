@@ -69,11 +69,6 @@ annotate service.UserRules with @(
     UI.LineItem #Rules                 : [
         {
             $Type: 'UI.DataField',
-            Value: ID,
-            Label: 'InstanceID',
-        },
-        {
-            $Type: 'UI.DataField',
             Value: baseRule_ID,
             Label: 'Rule Template ID',
         },
@@ -81,6 +76,11 @@ annotate service.UserRules with @(
             $Type : 'UI.DataField',
             Value : baseRule.ruleType.description,
             Label : 'Rule Description',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : baseRule.value,
+            Label : 'Rule Value',
         },
         {
             $Type: 'UI.DataField',
