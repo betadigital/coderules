@@ -1,0 +1,27 @@
+{
+  "destinations": [
+    {
+      "name": "srv-api",
+      "url": "http://localhost:4004",
+      "forwardAuthToken": true
+    },
+    {
+      "name": "sapui5",
+      "url": "https://ui5.sap.com"
+    }
+  ],
+  "VCAP_SERVICES": {
+    "xsuaa": [
+      {
+        "name": "code-rules-xsuaa",
+        "credentials": {
+          "xsappname": "code-review-rules!t76906",
+          "clientid": "sb-code-review-rules!t76906",
+          "clientsecret": "163d8c4a-5173-450c-9aff-50aa39dc81f4$AnjnpUnU2yRIG3UGAUmPG7OT9hsM534USe5ZLc3FIMQ=",
+          "url": "https://development.authentication.ap10.hana.ondemand.com",
+          "uaadomain": "authentication.ap10.hana.ondemand.com"
+        }
+      }
+    ]
+  }
+}
