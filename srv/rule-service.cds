@@ -112,6 +112,9 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
+    action   addLog(user: String, transportRequest: String, checkDate: Date, 
+    objectType: String, ruleType: String, value: String, result: String) returns String;
+
     function getApplicableRules(userId: String)               returns array of SimpleRule;
 
     function getAllRules(userId: String)                      returns array of SimpleRule;

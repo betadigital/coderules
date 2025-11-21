@@ -48,7 +48,16 @@ entity CodeUser : managed {
         trusted : Boolean;
 }
 
+@assert.unique: {
+        AutomationLogEntry: [
+            user,
+            transportRequest,
+            checkDate,
+            baseRule
+        ]
+    }
 entity AutomationLog : cuid {
+    
     user             : Association to one CodeUser;
     transportRequest : String(20);
     checkDate        : Date;

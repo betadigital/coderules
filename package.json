@@ -21,7 +21,9 @@
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
     "go": "npm run build && npm run deploy",
     "watch-baseruleapp": "cds watch --open baseruleapp/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "watch-userrulesapp": "cds watch --open userrulesapp/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-userrulesapp": "cds watch --open userrulesapp/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "start:router": "npm --prefix app/router start",
+    "devRouter": "cds bind --exec -- npm run start:router"
   },
   "private": true,
   "cds": {

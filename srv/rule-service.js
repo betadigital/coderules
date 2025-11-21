@@ -1,213 +1,265 @@
-const cds = require('@sap/cds');
-const { UPDATE, SELECT } = require('@sap/cds/lib/ql/cds-ql');
+const cds = require("@sap/cds");
+const { UPDATE, SELECT } = require("@sap/cds/lib/ql/cds-ql");
 
 module.exports = (srv) => {
-    // Get the entities from your service definition (the projections)
-    const { UserRules, BaseRules, CodeUsers, AutomationLogs } = srv.entities;
+  // Get the entities from your service definition (the projections)
+  const { UserRules, BaseRules, CodeUsers, AutomationLogs } = srv.entities;
 
-    srv.before('CREATE', CodeUsers, (req) => {
+  srv.before("CREATE", CodeUsers, (req) => {
+    // Only set it to false if the user didn't provide a value
+    if (req.data.trusted === undefined || req.data.trusted === null) {
+      req.data.trusted = false;
+    }
+  });
 
+  srv.before("*", async (req) => {
+    // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
+    console.log(
+      `[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${
+        req.target ? req.target.name : "unknown"
+      }`
+    );
+    if (req.user) {
+      console.log(
+        "User credentials detected on HTTP request. See below:\nID: ",
+        req.user.id,
+        "\nRoles: ",
+        req.user.roles,
+        "\nEmail: ",
+        req.user.attr.email
+      );
+    } else {
+      console.log("Unauthenticated request received...");
+    }
+  });
 
-        // Only set it to false if the user didn't provide a value
-        if (req.data.trusted === undefined || req.data.trusted === null) {
-            req.data.trusted = false;
-        }
-    });
+  srv.on("addLog", async (req) => {
+    const {
+      user,
+      transportRequest,
+      checkDate,
+      objectType,
+      ruleType,
+      value,
+      result,
+    } = req.data;
 
-    srv.before('*', async (req) => {
-        // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
-        console.log(`[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${req.target ? req.target.name : 'unknown'}`);
-        if (req.user) {
-            console.log("User credentials detected on HTTP request. See below:\nID: ",
-                req.user.id,
-                "\nRoles: ", req.user.roles,
-                "\nEmail: ", req.user.attr.email
-            );
-        }
-        else {
-            console.log("Unauthenticated request received...");
-        }
-    });
+    if (
+      !user ||
+      !transportRequest ||
+      !checkDate ||
+      !objectType ||
+      !ruleType ||
+      !value ||
+      !result
+    ) {
+      return req.error(
+        400,
+        `One (or more) of the required fields is invalid.
+                Received: userId: ${user}, transportRequest: ${transportRequest}, checkDate: ${checkDate}, objectType: ${objectType}, 
+                ruleType: ${ruleType}, value: ${value}, result: ${result}`
+      );
+    }
 
-    srv.on('CREATE', AutomationLogs, async (req) => {
-        const { userId, transportRequest, checkDate, objectType, ruleType, value, result } = req.data;
+    console.log(result.toLowerCase().trim());
+    if (
+      !(
+        result.toLowerCase().trim() == "pass" ||
+        result.toLowerCase().trim() == "fail"
+      )
+    ) {
+      return req.error(400, `Result ${result} invalid.`);
+    }
+    const tx = cds.tx(req);
+    let existingRule = await tx.run(
+      SELECT.one
+        .from(BaseRules)
+        .where({ objectType: objectType, ruleType: ruleType, value: value })
+    );
+    console.log(existingRule);
+    if (!existingRule) {
+      // Create this rule if it doesnt exist.
+      const rulePayload = {
+        objectType: objectType,
+        ruleType_code: ruleType,
+        value: value,
+      };
+      await tx.run(INSERT.into(BaseRules).entries(rulePayload));
+      existingRule = await tx.run(
+        SELECT.one
+          .from(BaseRules)
+          .where({ objectType: objectType, ruleType_code: ruleType, value: value })
+      );
+    }
+    const payloadUser = { ID: user };
 
-        if (!userId || !transportRequest || !checkDate || !objectType || !ruleType || !value || !result) {
-            return req.error(400, `One (or more) of the required fields is invalid.
-                Received: userId: ${userId}, transportRequest: ${transportRequest}, checkDate: ${checkDate}, objectType: ${objectType}, 
-                ruleType: ${ruleType}, value: ${value}, result: ${result}`)
-        }
-
-        const tx = cds.tx(req);
-        const [existingRule] = tx.run(SELECT.one.from(BaseRules).where({ objectType: objectType, ruleType: ruleType, value: value }));
-
-        console.log(existingRule);
-        return;
-
-    })
-
-    /**
-     * Reusable query to get all user rule data with nested associations.
-     * We will flatten this result in our functions.
-     */
-    const _buildSelectQuery = () => {
-        return SELECT.from(UserRules, r => {
-            r.effectiveDate,
-                r.endDate,
-                r.baseRule(b => {
-                    b.ID,
-                        b.objectType,
-                        b.value,
-                        b.ruleType(rt => {
-                            rt.code,
-                                rt.description
-                        })
-                })
-        });
+    const payload = {
+      user: payloadUser,
+      transportRequest: transportRequest,
+      checkDate: checkDate,
+      baseRule: existingRule,
+      result: result,
     };
+    const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
 
-    /**
-     * Reusable function to flatten the query result.
-     */
-    const _flattenRules = (rules, user) => {
-        if (!rules || rules.length === 0) {
-            return [];
-        }
+    return `Successfully inserted AutomationLog.`;
+  });
 
-        return rules.map(rule => {
-            // Handle cases where baseRule or ruleType might be null
-            const baseRule = rule.baseRule || {};
-            const ruleType = baseRule.ruleType || {};
-
-            return {
-                effectiveDate: rule.effectiveDate,
-                endDate: rule.endDate,
-                baseRule_ID: baseRule.ID,
-                baseRule_objectType: baseRule.objectType,
-                baseRule_value: baseRule.value,
-                baseRule_ruleType_code: ruleType.code,
-                baseRule_ruleType_description: ruleType.description,
-                user_ID: user,
-            };
+  /**
+   * Reusable query to get all user rule data with nested associations.
+   * We will flatten this result in our functions.
+   */
+  const _buildSelectQuery = () => {
+    return SELECT.from(UserRules, (r) => {
+      r.effectiveDate,
+        r.endDate,
+        r.baseRule((b) => {
+          b.ID,
+            b.objectType,
+            b.value,
+            b.ruleType((rt) => {
+              rt.code, rt.description;
+            });
         });
-    };
+    });
+  };
 
+  /**
+   * Reusable function to flatten the query result.
+   */
+  const _flattenRules = (rules, user) => {
+    if (!rules || rules.length === 0) {
+      return [];
+    }
 
+    return rules.map((rule) => {
+      // Handle cases where baseRule or ruleType might be null
+      const baseRule = rule.baseRule || {};
+      const ruleType = baseRule.ruleType || {};
 
-    /**
-         * Get all rules that are currently active for a user.
-         * (Current date is between effectiveDate and endDate)
-         *
-         * This implementation returns a flatten json string array.
-     */
-    srv.on('getApplicableRules', async (req) => {
-        const { userId } = req.data;
-        if (!userId) {
-            return req.error(400, 'User ID is required');
-        }
+      return {
+        effectiveDate: rule.effectiveDate,
+        endDate: rule.endDate,
+        baseRule_ID: baseRule.ID,
+        baseRule_objectType: baseRule.objectType,
+        baseRule_value: baseRule.value,
+        baseRule_ruleType_code: ruleType.code,
+        baseRule_ruleType_description: ruleType.description,
+        user_ID: user,
+      };
+    });
+  };
 
-        const tx = cds.tx(req);
-        const today = new Date().toLocaleDateString('en-CA', {
-            timeZone: 'Australia/Sydney'
-        });
-        //  Build the base query
-        const query = _buildSelectQuery();
+  /**
+   * Get all rules that are currently active for a user.
+   * (Current date is between effectiveDate and endDate)
+   *
+   * This implementation returns a flatten json string array.
+   */
+  srv.on("getApplicableRules", async (req) => {
+    const { userId } = req.data;
+    if (!userId) {
+      return req.error(400, "User ID is required");
+    }
 
-        // Add the WHERE clause for this function
-        query.where({
-            user_ID: userId,
-            and: {
-                effectiveDate: { '<=': today },
-                endDate: { '>=': today }
-            }
-        });
+    const tx = cds.tx(req);
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Australia/Sydney",
+    });
+    //  Build the base query
+    const query = _buildSelectQuery();
 
-        // Run the query
-        const activeRulesResult = await tx.run(query);
-
-        // Flatten the result using the map helper
-        return _flattenRules(activeRulesResult, userId);
+    // Add the WHERE clause for this function
+    query.where({
+      user_ID: userId,
+      and: {
+        effectiveDate: { "<=": today },
+        endDate: { ">=": today },
+      },
     });
 
-    /**
-     * Get all rules assigned to a user, regardless of date.
-     */
-    srv.on('getAllRules', async (req) => {
-        const { userId } = req.data;
-        if (!userId) {
-            return req.error(400, 'User ID is required');
-        }
+    // Run the query
+    const activeRulesResult = await tx.run(query);
 
-        const tx = cds.tx(req);
+    // Flatten the result using the map helper
+    return _flattenRules(activeRulesResult, userId);
+  });
 
-        // 1. Build the base query
-        const query = _buildSelectQuery();
+  /**
+   * Get all rules assigned to a user, regardless of date.
+   */
+  srv.on("getAllRules", async (req) => {
+    const { userId } = req.data;
+    if (!userId) {
+      return req.error(400, "User ID is required");
+    }
 
-        // 2. Add the WHERE clause for this function
-        query.where({ user_ID: userId });
+    const tx = cds.tx(req);
 
-        // 3. Run the query
-        const allRulesResult = await tx.run(query);
+    // 1. Build the base query
+    const query = _buildSelectQuery();
 
-        // 4. Flatten the result using the map helper
-        return _flattenRules(allRulesResult, userId);
-    });
+    // 2. Add the WHERE clause for this function
+    query.where({ user_ID: userId });
 
+    // 3. Run the query
+    const allRulesResult = await tx.run(query);
 
-    srv.on('setTrustedUser', async (req) => {
-        const { userId, trusted } = req.data;
+    // 4. Flatten the result using the map helper
+    return _flattenRules(allRulesResult, userId);
+  });
 
-        if (!userId) {
-            return req.error(400, 'User ID is required');
-        }
+  srv.on("setTrustedUser", async (req) => {
+    const { userId, trusted } = req.data;
 
-        const tx = cds.tx(req);
+    if (!userId) {
+      return req.error(400, "User ID is required");
+    }
 
-        const [user] = await tx.run(UPDATE(CodeUsers).set({ trusted: trusted }).where({ ID: userId }));
+    const tx = cds.tx(req);
 
-        return user;
-    })
+    const [user] = await tx.run(
+      UPDATE(CodeUsers).set({ trusted: trusted }).where({ ID: userId })
+    );
 
-    /**
-     * Checks for and removes all rules for a user that are no longer valid.
-     * (Current date is NOT between effectiveDate and endDate)
-     */
-    srv.on('checkForOverdueRules', async (req) => {
-        const { userId } = req.data;
-        if (!userId) {
-            return req.error(400, 'User ID is required');
-        }
-        const tx = cds.tx(req);
-        const today = new Date().toISOString().split('T')[0];
+    return user;
+  });
 
-        const overdueRules = await tx.run(
-            SELECT.from(UserRules, ['ID'])
-                .where({
-                    user_ID: userId,       // Filter by the user (string ID)
-                    and: {
-                        effectiveDate: { '>': today }, // and today is on or after the start date
-                        endDate: { '<': today }        // and today is on or before the end date
-                    }
-                })
-        );
+  /**
+   * Checks for and removes all rules for a user that are no longer valid.
+   * (Current date is NOT between effectiveDate and endDate)
+   */
+  srv.on("checkForOverdueRules", async (req) => {
+    const { userId } = req.data;
+    if (!userId) {
+      return req.error(400, "User ID is required");
+    }
+    const tx = cds.tx(req);
+    const today = new Date().toISOString().split("T")[0];
 
-        if (overdueRules.length === 0) {
-            return `No overdue rules found for user ${userId}.`;
-        }
+    const overdueRules = await tx.run(
+      SELECT.from(UserRules, ["ID"]).where({
+        user_ID: userId, // Filter by the user (string ID)
+        and: {
+          effectiveDate: { ">": today }, // and today is on or after the start date
+          endDate: { "<": today }, // and today is on or before the end date
+        },
+      })
+    );
 
-        // 2. Get the list of IDs and delete them
-        const ruleIDs = overdueRules.map(rule => rule.ID);
+    if (overdueRules.length === 0) {
+      return `No overdue rules found for user ${userId}.`;
+    }
 
-        // Use the service projection 'UserRules'
-        const deleteResult = await tx.run(
-            DELETE.from(UserRules)
-                .where({ ID: { in: ruleIDs } })
-        );
+    // 2. Get the list of IDs and delete them
+    const ruleIDs = overdueRules.map((rule) => rule.ID);
 
-        // deleteResult is the number of rows affected
-        return `Removed ${deleteResult} overdue rules for user ${userId}.`;
-    });
+    // Use the service projection 'UserRules'
+    const deleteResult = await tx.run(
+      DELETE.from(UserRules).where({ ID: { in: ruleIDs } })
+    );
 
-
-
+    // deleteResult is the number of rows affected
+    return `Removed ${deleteResult} overdue rules for user ${userId}.`;
+  });
 };
