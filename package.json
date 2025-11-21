@@ -12,18 +12,20 @@
     "@cap-js/sqlite": "^2",
     "@sap/cds-dk": "^9",
     "cds-plugin-ui5": "^0.13.0",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "mbt": "^1.2.29"
   },
   "scripts": {
     "start": "cds-serve",
     "undeploy": "cf undeploy code-review-rules --delete-services --delete-service-keys --delete-service-brokers",
-    "build": "rm -rf resources mta_archives && mbt build --mtar archive",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
     "go": "npm run build && npm run deploy",
     "watch-baseruleapp": "cds watch --open baseruleapp/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-userrulesapp": "cds watch --open userrulesapp/index.html?sap-ui-xx-viewCache=false --livereload false",
     "start:router": "npm --prefix app/router start",
-    "devRouter": "cds bind --exec -- npm run start:router"
+    "devRouter": "cds bind --exec -- npm run start:router",
+    "watch-logsapp": "cds watch --open logsapp/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
   "cds": {
@@ -62,6 +64,7 @@
   ],
   "sapux": [
     "app/baseruleapp",
-    "app/userrulesapp"
+    "app/userrulesapp",
+    "app/logsapp"
   ]
 }

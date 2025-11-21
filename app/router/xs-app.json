@@ -14,6 +14,12 @@
       "authenticationType": "xsuaa"
     },
     {
+      "source": "^/logsapp/(.*)$",
+      "target": "$1",
+      "localDir": "../logsapp/webapp",
+      "authenticationType": "xsuaa"
+    },
+    {
       "source": "^/resources/(.*)$",
       "target": "/resources/$1",
       "authenticationType": "none",
