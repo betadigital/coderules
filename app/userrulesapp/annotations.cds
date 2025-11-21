@@ -8,6 +8,11 @@ annotate service.CodeUsers with @(
             Label: 'ID',
         },
         {
+            $Type : 'UI.DataField',
+            Value : trusted,
+            Label : 'trusted',
+        },
+        {
             $Type: 'UI.DataField',
             Value: createdBy,
         },

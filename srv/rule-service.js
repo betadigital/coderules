@@ -1,8 +1,18 @@
 const cds = require('@sap/cds');
+const { UPDATE, SELECT } = require('@sap/cds/lib/ql/cds-ql');
 
 module.exports = (srv) => {
     // Get the entities from your service definition (the projections)
-    const { UserRules, BaseRules, CodeUsers } = srv.entities;
+    const { UserRules, BaseRules, CodeUsers, AutomationLogs } = srv.entities;
+
+    srv.before('CREATE', CodeUsers, (req) => {
+
+
+        // Only set it to false if the user didn't provide a value
+        if (req.data.trusted === undefined || req.data.trusted === null) {
+            req.data.trusted = false;
+        }
+    });
 
     srv.before('*', async (req) => {
         // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
@@ -18,6 +28,23 @@ module.exports = (srv) => {
             console.log("Unauthenticated request received...");
         }
     });
+
+    srv.on('CREATE', AutomationLogs, async (req) => {
+        const { userId, transportRequest, checkDate, objectType, ruleType, value, result } = req.data;
+
+        if (!userId || !transportRequest || !checkDate || !objectType || !ruleType || !value || !result) {
+            return req.error(400, `One (or more) of the required fields is invalid.
+                Received: userId: ${userId}, transportRequest: ${transportRequest}, checkDate: ${checkDate}, objectType: ${objectType}, 
+                ruleType: ${ruleType}, value: ${value}, result: ${result}`)
+        }
+
+        const tx = cds.tx(req);
+        const [existingRule] = tx.run(SELECT.one.from(BaseRules).where({ objectType: objectType, ruleType: ruleType, value: value }));
+
+        console.log(existingRule);
+        return;
+
+    })
 
     /**
      * Reusable query to get all user rule data with nested associations.
@@ -60,7 +87,7 @@ module.exports = (srv) => {
                 baseRule_value: baseRule.value,
                 baseRule_ruleType_code: ruleType.code,
                 baseRule_ruleType_description: ruleType.description,
-                user_ID: user
+                user_ID: user,
             };
         });
     };
@@ -80,12 +107,13 @@ module.exports = (srv) => {
         }
 
         const tx = cds.tx(req);
-        const today = new Date().toISOString().split('T')[0];
-
-        // 1. Build the base query
+        const today = new Date().toLocaleDateString('en-CA', {
+            timeZone: 'Australia/Sydney'
+        });
+        //  Build the base query
         const query = _buildSelectQuery();
 
-        // 2. Add the WHERE clause for this function
+        // Add the WHERE clause for this function
         query.where({
             user_ID: userId,
             and: {
@@ -94,10 +122,10 @@ module.exports = (srv) => {
             }
         });
 
-        // 3. Run the query
+        // Run the query
         const activeRulesResult = await tx.run(query);
 
-        // 4. Flatten the result using the map helper
+        // Flatten the result using the map helper
         return _flattenRules(activeRulesResult, userId);
     });
 
@@ -124,6 +152,21 @@ module.exports = (srv) => {
         // 4. Flatten the result using the map helper
         return _flattenRules(allRulesResult, userId);
     });
+
+
+    srv.on('setTrustedUser', async (req) => {
+        const { userId, trusted } = req.data;
+
+        if (!userId) {
+            return req.error(400, 'User ID is required');
+        }
+
+        const tx = cds.tx(req);
+
+        const [user] = await tx.run(UPDATE(CodeUsers).set({ trusted: trusted }).where({ ID: userId }));
+
+        return user;
+    })
 
     /**
      * Checks for and removes all rules for a user that are no longer valid.

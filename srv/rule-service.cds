@@ -17,7 +17,7 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity RuleTypes as
+    entity RuleTypes      as
         projection on codeRules.RuleType {
             *
         };
@@ -25,7 +25,7 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity BaseRules as
+    entity BaseRules      as
         projection on codeRules.BaseRule {
             ID,
             objectType,
@@ -56,7 +56,7 @@ service RuleService @(path: '/codeRuleService') {
 
     @odata.draft.enabled
     @Common.Label: 'Code User'
-    entity CodeUsers as
+    entity CodeUsers      as
         projection on codeRules.CodeUser {
             @(
                 Common.Label  : 'User ID / Name',
@@ -67,12 +67,15 @@ service RuleService @(path: '/codeRuleService') {
             createdBy,
             createdAt,
             modifiedBy,
-            rules
+            rules,
+            trusted
         };
+
+    entity AutomationLogs as projection on codeRules.AutomationLog;
 
 
     // UserRules — child of CodeUser, draft handled by parent
-    entity UserRules as
+    entity UserRules      as
         projection on codeRules.UserRule {
             ID,
             user,
@@ -109,11 +112,13 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    function getApplicableRules(userId: String)   returns array of SimpleRule;
+    function getApplicableRules(userId: String)               returns array of SimpleRule;
 
-    function getAllRules(userId: String)          returns array of SimpleRule;
+    function getAllRules(userId: String)                      returns array of SimpleRule;
 
-    action   checkForOverdueRules(userId: String) returns String;
+    function setTrustedUser(userId: String, trusted: Boolean) returns String;
+
+    action   checkForOverdueRules(userId: String)             returns String;
 
 
 }

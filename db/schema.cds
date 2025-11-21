@@ -17,6 +17,7 @@ entity BaseRule : cuid, managed {
 
     @mandatory
     ruleType   : Association to one RuleType;
+
     @mandatory
     value      : String(50);
 }
@@ -39,7 +40,18 @@ entity UserRule : managed {
 }
 
 entity CodeUser : managed {
-    key ID    : String(36);
-        rules : Composition of many UserRule
-                    on rules.user = $self;
+    key ID      : String(36);
+        rules   : Composition of many UserRule
+                      on rules.user = $self;
+
+        @mandatory
+        trusted : Boolean;
+}
+
+entity AutomationLog : cuid {
+    user             : Association to one CodeUser;
+    transportRequest : String(20);
+    checkDate        : Date;
+    baseRule         : Association to one BaseRule;
+    result           : String(10);
 }
