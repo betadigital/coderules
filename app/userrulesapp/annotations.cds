@@ -10,7 +10,7 @@ annotate service.CodeUsers with @(
         {
             $Type : 'UI.DataField',
             Value : trusted,
-            Label : 'trusted',
+            Label : 'Trusted',
         },
         {
             $Type: 'UI.DataField',
@@ -96,6 +96,11 @@ annotate service.UserRules with @(
             $Type: 'UI.DataField',
             Value: endDate,
             Label: 'Rule end date',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : baseRule.severityRating,
+            Label : '{i18n>SeverityRating}',
         },
     ],
     UI.HeaderFacets                    : [{

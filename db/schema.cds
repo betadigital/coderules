@@ -20,6 +20,9 @@ entity BaseRule : cuid, managed {
 
     @mandatory
     value      : String(50);
+
+    @mandatory
+    severityRating: Int16;
 }
 
 entity RuleType {

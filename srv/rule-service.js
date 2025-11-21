@@ -83,6 +83,7 @@ module.exports = (srv) => {
         objectType: objectType,
         ruleType_code: ruleType,
         value: value,
+        severityRating: 1,
       };
       await tx.run(INSERT.into(BaseRules).entries(rulePayload));
       existingRule = await tx.run(
@@ -98,7 +99,7 @@ module.exports = (srv) => {
       transportRequest: transportRequest,
       checkDate: checkDate,
       baseRule: existingRule,
-      result: result,
+      result: result.toUpperCase(),
     };
     const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
 

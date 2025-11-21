@@ -30,6 +30,7 @@ service RuleService @(path: '/codeRuleService') {
             ID,
             objectType,
             value,
+            severityRating,
             ruleType.description as ruleType_description,
             @(
                 Common.ValueListWithFixedValues: true,
@@ -74,7 +75,7 @@ service RuleService @(path: '/codeRuleService') {
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
-    @Capabilities.DeleteRestrictions.Deletable : false
+    @Capabilities.DeleteRestrictions.Deletable: false
     entity AutomationLogs as projection on codeRules.AutomationLog;
 
 

@@ -30,6 +30,11 @@ annotate service.BaseRules with @(
             $Type : 'UI.DataField',
             Value : createdAt,
         },
+        {
+            $Type : 'UI.DataField',
+            Value : severityRating,
+            Label : 'Severity ',
+        },
     ],
     UI.Facets : [
         {
@@ -61,6 +66,11 @@ annotate service.BaseRules with @(
                 $Type : 'UI.DataField',
                 Value : value,
                 Label : 'Rule Value',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : severityRating,
+                Label : 'Severity Rating',
             },
         ],
     },
