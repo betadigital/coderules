@@ -91,3 +91,64 @@ Save and CheckSave the destination. You can use the Check Connection button to v
 - For frontend users, role assignments in the cockpit control CRUD access.  
 - Use the `m2m-key` for automated clients in your OAuth 2.0 **client credentials flow** to access backend APIs.
 - under `utils/dev_xs-app.json`, there is a development and production routing configuration file. Using the dev version allows you to run production environment tests with a real approuter and backend service instance. See https://cap.cloud.sap/docs/node.js/authentication#running-app-router for more information on how to do this.
+
+
+
+
+## <span style="text-decoration:underline;">POSTMAN AUTH HOW-TO</span>
+
+
+
+1. Get key
+* Run *cf service-key code-review-rules-atub m2m-key *in terminal
+* Note *url, clientid, clientsecret, xsappname*
+2. Create new request on Postman
+3. Go to Authorisation tab
+* Set Auth Type to OAuth2.0
+* Under configure new token, input the following:
+* Token name: code-rules-token
+* Grant type: Client Credentials
+* Access Token URL: url (from step one) /oauth/token (on SAPower BTP, this should be [https://bau-dev-app-cf-aws-syd-ias-acq.authentication.ap10.hana.ondemand.com](https://bau-dev-app-cf-aws-syd-ias-acq.authentication.ap10.hana.ondemand.com)/oauth/token)
+* ClientID: clientid from step 1
+* Client secret: client secret from step 1
+* Scope: xsappname.RuleM2M (should be code-review-rules!t59395.RuleM2M)
+* Client Authentication : Send as basic auth header
+4. Press get new access token -> proceed -> use token. You will now have authorisation to use the app from postman.
+
+(example using our BTP’s version of the app)
+
+
+
+<p id="gdcalert1" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image1.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert2">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
+
+
+![alt_text](images/image1.png "image_tooltip")
+
+
+
+### <span style="text-decoration:underline;">Creating the request - AddLog action</span>
+
+
+
+1. In the request address bar, input the base url of the deployed app, plus /codeRuleService/addLog
+2. Change the request type to POST
+3. Go to the body tab
+4. Select ‘raw’ option for the body type
+5. Create a body with the following structure:
+6. 
+
+<p id="gdcalert2" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image2.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert3">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
+
+
+![alt_text](images/image2.png "image_tooltip")
+
+7. Click send
+8. You should now see your new log in the log list app:
+
+
+
+<p id="gdcalert3" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image3.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert4">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
+
+
+![alt_text](images/image3.png "image_tooltip")
+
