@@ -15,8 +15,7 @@ module.exports = (srv) => {
   srv.before("*", async (req) => {
     // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
     console.log(
-      `[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${
-        req.target ? req.target.name : "unknown"
+      `[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${req.target ? req.target.name : "unknown"
       }`
     );
     if (req.user) {
@@ -42,6 +41,7 @@ module.exports = (srv) => {
       ruleType,
       value,
       result,
+      objectName, severity
     } = req.data;
 
     if (
@@ -51,7 +51,9 @@ module.exports = (srv) => {
       !objectType ||
       !ruleType ||
       !value ||
-      !result
+      !result ||
+      !severity ||
+      !objectName
     ) {
       return req.error(
         400,
@@ -100,6 +102,8 @@ module.exports = (srv) => {
       checkDate: checkDate,
       baseRule: existingRule,
       result: result.toUpperCase(),
+      severity: severity,
+      objectName: objectName
     };
     const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
 

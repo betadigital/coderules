@@ -82,6 +82,10 @@ modules:
           artifacts:
             - userrulesapp.zip
           target-path: resources/
+        - name: codereviewruleslogsapp
+          artifacts:
+            - logsapp.zip
+          target-path: resources/
 
   - name: codereviewrulesbaseruleapp
     type: html5
@@ -103,6 +107,17 @@ modules:
       commands:
         - npm ci
         - npm run build
+      supported-platforms: []
+
+  - name: codereviewruleslogsapp
+    type: html5
+    path: app/logsapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
       supported-platforms: []
 
 resources:

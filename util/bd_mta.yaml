@@ -1,87 +1,78 @@
 _schema-version: 3.3.0
 ID: code-review-rules
-version: 1.0.0
-description: "A simple CAP project."
-parameters:
-  enable-parallel-deployments: true
-  deploy_mode: html5-repo
-build-parameters:
-  before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production
+description: CAP Project with Fiori Frontend and Full AuthZ/AuthN
+version: 1.3.0
 modules:
   - name: code-review-rules-srv
     type: nodejs
     path: gen/srv
-    parameters:
-      instances: 1
-      buildpack: nodejs_buildpack
-    build-parameters:
-      builder: npm-ci
-    provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
-        properties:
-          srv-url: ${default-url}
     requires:
-      - name: code-review-rules-auth
+      - name: code-rules-xsuaa
       - name: code-review-rules-db
       - name: code-review-rules-destination
-
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    parameters:
+      buildpack: nodejs_buildpack
+      instances: 1
+    build-parameters:
+      builder: npm-ci
   - name: code-review-rules-db-deployer
     type: hdb
     path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
     requires:
       - name: code-review-rules-db
-
+    parameters:
+      buildpack: nodejs_buildpack
   - name: code-review-rules
     type: approuter.nodejs
     path: app/router
-    parameters:
-      keep-existing-routes: true
-      disk-quota: 256M
-      memory: 256M
     requires:
       - name: srv-api
         group: destinations
         properties:
-          name: srv-api # must be used in xs-app.json as well
-          url: ~{srv-url}
           forwardAuthToken: true
-      - name: code-review-rules-auth
+          name: srv-api
+          url: ~{srv-url}
+      - name: code-rules-xsuaa
       - name: code-review-rules-destination
-      - name: code-review-rules-html5-runtime # <-- Changed from repo-host
+      - name: code-review-rules-html5-runtime
     provides:
       - name: app-api
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
-
-  - name: code-review-rules-app-deployer # <-- Renamed for clarity
-    type: com.sap.application.content
-    path: . # <-- Changed path to root for build artifacts
     parameters:
-      app-config:
-        overwrite: true
+      disk-quota: 256M
+      keep-existing-routes: true
+      memory: 256M
+  - name: code-review-rules-app-deployer
+    type: com.sap.application.content
+    path: .
     requires:
       - name: code-review-rules-html5-repo-host
         parameters:
           content-target: true
+    parameters:
+      app-config:
+        overwrite: true
     build-parameters:
-      build-result: resources # <-- This points to the folder created by mbt
+      build-result: resources
       requires:
-        - name: codereviewrulesbaseruleapp
-          artifacts:
+        - artifacts:
             - baseruleapp.zip
-          target-path: resources/ # <-- This is the subfolder in the build-result
-        - name: codereviewrulesuserrulesapp
-          artifacts:
+          name: codereviewrulesbaseruleapp
+          target-path: resources/
+        - artifacts:
             - userrulesapp.zip
-          target-path: resources/ # <-- This is the subfolder in the build-result
-
+          name: codereviewrulesuserrulesapp
+          target-path: resources/
+        - artifacts:
+            - logsapp.zip
+          name: codereviewruleslogsapp
+          target-path: resources/
   - name: codereviewrulesbaseruleapp
     type: html5
     path: app/baseruleapp
@@ -89,8 +80,8 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        - npm ci
-        - npm run build
+        - npm install
+        - npm run build:cf
       supported-platforms: []
   - name: codereviewrulesuserrulesapp
     type: html5
@@ -99,75 +90,91 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        - npm ci
-        - npm run build
+        - npm install
+        - npm run build:cf
       supported-platforms: []
-
+  - name: codereviewruleslogsapp
+    type: html5
+    path: app/logsapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
 resources:
-  # XSUAA Service pointing to your existing instance
-  - name: code-review-rules-auth
+  - name: code-rules-xsuaa
     type: org.cloudfoundry.managed-service
     parameters:
-      service: xsuaa
-      service-plan: application
-      service-name: code-rules-xsuaa # <-- Binds to existing service
-      path: ./xs-security.json
       config:
-        tenant-mode: dedicated
-        xsappname: code-review-rules
         oauth2-configuration:
           redirect-uris:
-            - https://*.cfapps.*.hana.ondemand.com/login/callback # Generic callback
+            - https://*.cfapps.*.hana.ondemand.com/login/callback
             - https://*.${default-domain}/login/callback
             - https://*~{app-api/app-uri}/**
         role-collections:
-          - name: "RuleAdmin (code-review-rules ${org}-${space})"
-            description: "generated"
+          - description: generated
+            name: RuleAdmin (code-review-rules ${org}-${space})
             role-template-references:
-              - "$XSAPPNAME.RuleAdmin"
-          - name: "RuleReader (code-review-rules ${org}-${space})"
-            description: "generated"
+              - $XSAPPNAME.RuleAdmin
+          - description: generated
+            name: RuleReader (code-review-rules ${org}-${space})
             role-template-references:
-              - "$XSAPPNAME.RuleReader"
-          - name: "RuleCreator (code-review-rules ${org}-${space})"
-            description: "generated"
+              - $XSAPPNAME.RuleReader
+          - description: generated
+            name: RuleCreator (code-review-rules ${org}-${space})
             role-template-references:
-              - "$XSAPPNAME.RuleCreator"
-          - name: "RuleM2M (code-review-rules ${org}-${space})"
-            description: "generated"
+              - $XSAPPNAME.RuleCreator
+          - description: generated
+            name: RuleM2M (code-review-rules ${org}-${space})
             role-template-references:
-              - "$XSAPPNAME.RuleM2m"
+              - $XSAPPNAME.RuleM2m
+        tenant-mode: dedicated
+        xsappname: code-review-rules
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: code-rules-xsuaa
+      service-plan: application
     requires:
       - name: app-api
-
-  # HDI Container pointing to your existing instance
   - name: code-review-rules-db
-    type: org.cloudfoundry.managed-service # <-- Changed from com.sap.xs.hdi-container
+    type: org.cloudfoundry.managed-service
     parameters:
       service: hana
       service-plan: hdi-shared
-      service-name: code-review-rules-db # <-- Binds to existing service
-
-  # Destination Service (creates a new one, as it's 'lite')
   - name: code-review-rules-destination
     type: org.cloudfoundry.managed-service
     parameters:
+      config:
+        HTML5Runtime_enabled: false
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
       service: destination
       service-plan: lite
-      service-name: destination-service
-
-  # HTML5 Repo Host (creates a new one)
   - name: code-review-rules-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
-
-  # HTML5 Repo Runtime pointing to your existing instance
   - name: code-review-rules-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
-      service-name: html5-app-runtime # <-- Binds to existing service
-
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production

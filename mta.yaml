@@ -1,42 +1,58 @@
 _schema-version: 3.3.0
 ID: code-review-rules
-description: CAP Project with Fiori Frontend and Full AuthZ/AuthN
-version: 1.3.0
+version: 1.0.0
+description: "CAP Project with Fiori Frontend and Full AuthZ/AuthN"
+parameters:
+  enable-parallel-deployments: true
+  deploy_mode: html5-repo
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+
 modules:
   - name: code-review-rules-srv
     type: nodejs
     path: gen/srv
-    requires:
-      - name: code-rules-xsuaa
-      - name: code-review-rules-db
-      - name: code-review-rules-destination
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
     provides:
       - name: srv-api
         properties:
           srv-url: ${default-url}
-    parameters:
-      buildpack: nodejs_buildpack
-      instances: 1
-    build-parameters:
-      builder: npm-ci
+    requires:
+      - name: code-review-rules-auth
+      - name: code-review-rules-db
+      - name: code-review-rules-destination
+
   - name: code-review-rules-db-deployer
     type: hdb
     path: gen/db
-    requires:
-      - name: code-review-rules-db
     parameters:
       buildpack: nodejs_buildpack
+    requires:
+      - name: code-review-rules-db
+
   - name: code-review-rules
     type: approuter.nodejs
     path: app/router
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 256M
+      memory: 256M
     requires:
       - name: srv-api
         group: destinations
         properties:
-          forwardAuthToken: true
           name: srv-api
           url: ~{srv-url}
-      - name: code-rules-xsuaa
+          forwardAuthToken: true
+      - name: code-review-rules-auth
       - name: code-review-rules-destination
       - name: code-review-rules-html5-runtime
     provides:
@@ -44,35 +60,33 @@ modules:
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
-    parameters:
-      disk-quota: 256M
-      keep-existing-routes: true
-      memory: 256M
+
   - name: code-review-rules-app-deployer
     type: com.sap.application.content
     path: .
+    parameters:
+      app-config:
+        overwrite: true
     requires:
       - name: code-review-rules-html5-repo-host
         parameters:
           content-target: true
-    parameters:
-      app-config:
-        overwrite: true
     build-parameters:
       build-result: resources
       requires:
-        - artifacts:
+        - name: codereviewrulesbaseruleapp
+          artifacts:
             - baseruleapp.zip
-          name: codereviewrulesbaseruleapp
           target-path: resources/
-        - artifacts:
+        - name: codereviewrulesuserrulesapp
+          artifacts:
             - userrulesapp.zip
-          name: codereviewrulesuserrulesapp
           target-path: resources/
-        - artifacts:
+        - name: codereviewruleslogsapp
+          artifacts:
             - logsapp.zip
-          name: codereviewruleslogsapp
           target-path: resources/
+
   - name: codereviewrulesbaseruleapp
     type: html5
     path: app/baseruleapp
@@ -80,9 +94,10 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        - npm install
-        - npm run build:cf
+        - npm ci
+        - npm run build
       supported-platforms: []
+
   - name: codereviewrulesuserrulesapp
     type: html5
     path: app/userrulesapp
@@ -90,9 +105,10 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        - npm install
-        - npm run build:cf
+        - npm ci
+        - npm run build
       supported-platforms: []
+
   - name: codereviewruleslogsapp
     type: html5
     path: app/logsapp
@@ -103,78 +119,67 @@ modules:
         - npm install
         - npm run build:cf
       supported-platforms: []
+
 resources:
-  - name: code-rules-xsuaa
+  # XSUAA Service pointing to your existing instance
+  - name: code-review-rules-auth
     type: org.cloudfoundry.managed-service
     parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
       config:
+        tenant-mode: dedicated
+        xsappname: code-review-rules
         oauth2-configuration:
           redirect-uris:
-            - https://*.cfapps.*.hana.ondemand.com/login/callback
+            - https://*.cfapps.*.hana.ondemand.com/login/callback # Generic callback
             - https://*.${default-domain}/login/callback
             - https://*~{app-api/app-uri}/**
         role-collections:
-          - description: generated
-            name: RuleAdmin (code-review-rules ${org}-${space})
+          - name: "RuleAdmin (code-review-rules ${org}-${space})"
+            description: "generated"
             role-template-references:
-              - $XSAPPNAME.RuleAdmin
-          - description: generated
-            name: RuleReader (code-review-rules ${org}-${space})
+              - "$XSAPPNAME.RuleAdmin"
+          - name: "RuleReader (code-review-rules ${org}-${space})"
+            description: "generated"
             role-template-references:
-              - $XSAPPNAME.RuleReader
-          - description: generated
-            name: RuleCreator (code-review-rules ${org}-${space})
+              - "$XSAPPNAME.RuleReader"
+          - name: "RuleCreator (code-review-rules ${org}-${space})"
+            description: "generated"
             role-template-references:
-              - $XSAPPNAME.RuleCreator
-          - description: generated
-            name: RuleM2M (code-review-rules ${org}-${space})
+              - "$XSAPPNAME.RuleCreator"
+          - name: "RuleM2M (code-review-rules ${org}-${space})"
+            description: "generated"
             role-template-references:
-              - $XSAPPNAME.RuleM2m
-        tenant-mode: dedicated
-        xsappname: code-review-rules
-      path: ./xs-security.json
-      service: xsuaa
-      service-name: code-rules-xsuaa
-      service-plan: application
+              - "$XSAPPNAME.RuleM2m"
     requires:
       - name: app-api
+
+  # HDI Container (HANA)
   - name: code-review-rules-db
     type: org.cloudfoundry.managed-service
     parameters:
       service: hana
       service-plan: hdi-shared
+
+  # Destination Service
   - name: code-review-rules-destination
     type: org.cloudfoundry.managed-service
     parameters:
-      config:
-        HTML5Runtime_enabled: false
-        init_data:
-          instance:
-            destinations:
-              - Authentication: NoAuthentication
-                Name: ui5
-                ProxyType: Internet
-                Type: HTTP
-                URL: https://ui5.sap.com
-            existing_destinations_policy: update
       service: destination
       service-plan: lite
+
+  # HTML5 Repo Host
   - name: code-review-rules-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
+
+  # HTML5 Repo Runtime
   - name: code-review-rules-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
-parameters:
-  deploy_mode: html5-repo
-  enable-parallel-deployments: true
-build-parameters:
-  before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production

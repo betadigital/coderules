@@ -13,16 +13,16 @@ using {
 ]}
 entity BaseRule : cuid, managed {
     @mandatory
-    objectType : String(10);
+    objectType     : String(10);
 
     @mandatory
-    ruleType   : Association to one RuleType;
+    ruleType       : Association to one RuleType;
 
     @mandatory
-    value      : String(50);
+    value          : String(50);
 
     @mandatory
-    severityRating: Int16;
+    severityRating : Int16;
 }
 
 entity RuleType {
@@ -51,19 +51,19 @@ entity CodeUser : managed {
         trusted : Boolean;
 }
 
-@assert.unique: {
-        AutomationLogEntry: [
-            user,
-            transportRequest,
-            checkDate,
-            baseRule
-        ]
-    }
+@assert.unique: {AutomationLogEntry: [
+    user,
+    transportRequest,
+    checkDate,
+    baseRule
+]}
 entity AutomationLog : cuid {
-    
+
     user             : Association to one CodeUser;
     transportRequest : String(20);
     checkDate        : Date;
     baseRule         : Association to one BaseRule;
+    objectName       : String(200);
+    severity         : Int16;
     result           : String(10);
 }

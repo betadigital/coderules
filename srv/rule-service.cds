@@ -75,7 +75,7 @@ service RuleService @(path: '/codeRuleService') {
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
-    @Capabilities.DeleteRestrictions.Deletable: false
+    @Capabilities.DeleteRestrictions.Deletable : false
     entity AutomationLogs as projection on codeRules.AutomationLog;
 
 
@@ -123,7 +123,9 @@ service RuleService @(path: '/codeRuleService') {
                     objectType: String,
                     ruleType: String,
                     value: String,
-                    result: String)                           returns String;
+                    result: String,
+                    objectName: String,
+                    severity: Int16, )                        returns String;
 
     function getApplicableRules(userId: String)               returns array of SimpleRule;
 

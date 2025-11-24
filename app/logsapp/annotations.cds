@@ -33,6 +33,16 @@ annotate service.AutomationLogs with @(
         },
         {
             $Type : 'UI.DataField',
+            Value : objectName,
+            Label : 'Object Name',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : severity,
+            Label : 'Severity',
+        },
+        {
+            $Type : 'UI.DataField',
             Value : result,
             Label : '{i18n>Result}',
         },
