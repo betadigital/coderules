@@ -21,7 +21,8 @@
       "name": "$XSAPPNAME.RuleM2M",
       "description": "M2M authorisation scope.",
       "grant-as-authority-to-apps": [
-        "sb-code-review-rules!t76906"
+        "sb-code-review-rules!t76906",
+        "sb-code-review-rules!t59395"
       ]
     }
   ],
