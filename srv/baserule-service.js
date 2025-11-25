@@ -22,12 +22,13 @@ module.exports = (srv) => {
 
     // --- Your Event Handlers ---
 
-    // 1. Your REFACTORED 'CREATE' handler
+    // REFACTORED 'CREATE' handler
     srv.before('CREATE', 'BaseRules', async (req) => {
-        const { objectType, ruleType_code, value } = req.data;
+        const { objectType_code: objectType, ruleType_code, value } = req.data;
 
         // A. Validate required fields
         if (!objectType || !ruleType_code || value == null) {
+            console.log(`Object type: ${objectType}, ruleType: ${ruleType_code}, value: ${value}`);
             return req.error(400, 'objectType, ruleType_code, and value are required fields.');
         }
 
@@ -80,7 +81,7 @@ module.exports = (srv) => {
             }
 
             // 5. Check uniqueness (only if a relevant field is being changed)
-            const { objectType, ruleType_code, value } = req.data;
+            const { objectType_code: objectType, ruleType_code, value } = req.data;
             if (objectType || ruleType_code || value != null) {
 
                 const duplicate = await SELECT.one.from(BaseRules)

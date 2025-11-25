@@ -79,6 +79,11 @@ annotate service.UserRules with @(
         },
         {
             $Type : 'UI.DataField',
+            Value : baseRule.objectType_code,
+            Label : 'Object Type',
+        },
+        {
+            $Type : 'UI.DataField',
             Value : baseRule.ruleType.description,
             Label : 'Rule Description',
         },
@@ -173,11 +178,6 @@ annotate service.UserRules with @(
                 Label: 'Rule Template ID',
             },
             {
-                $Type: 'UI.DataField',
-                Value: baseRule.createdBy,
-                Label: 'Rule Author',
-            },
-            {
                 $Type : 'UI.DataField',
                 Value : baseRule.ruleType.code,
                 Label : 'Rule Code',
@@ -194,8 +194,17 @@ annotate service.UserRules with @(
             },
             {
                 $Type : 'UI.DataField',
-                Value : baseRule.objectType,
-                Label : 'Object Type',
+                Value : baseRule.objectType_code,
+                Label : '{i18n>ObjectType}',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : createdAt,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : createdBy,
+                Label : 'Applied by',
             },
         ],
     },

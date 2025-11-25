@@ -8,18 +8,23 @@ annotate service.BaseRules with @(
         },
         {
             $Type : 'UI.DataField',
+            Value : objectType_code,
+            Label : 'Object Type',
+        },
+        {
+            $Type : 'UI.DataField',
             Value : ruleType.description,
             Label : '{i18n>RuleDescription}',
         },
         {
             $Type : 'UI.DataField',
-            Value : objectType,
-            Label : 'Object Type',
+            Value : ruleType_code,
+            Label : '{i18n>RuleType}',
         },
         {
             $Type : 'UI.DataField',
-            Value : ruleType_code,
-            Label : '{i18n>RuleType}',
+            Value : value,
+            Label : 'Rule Value',
         },
         {
             $Type : 'UI.DataField',
@@ -49,6 +54,11 @@ annotate service.BaseRules with @(
         Data : [
             {
                 $Type : 'UI.DataField',
+                Value : objectType_code,
+                Label : 'Object Type',
+            },
+            {
+                $Type : 'UI.DataField',
                 Value : ruleType_code,
                 Label : 'Rule Code',
             },
@@ -56,11 +66,6 @@ annotate service.BaseRules with @(
                 $Type : 'UI.DataField',
                 Value : ruleType.description,
                 Label : '{i18n>RuleDescription}',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : objectType,
-                Label : 'Object Type',
             },
             {
                 $Type : 'UI.DataField',

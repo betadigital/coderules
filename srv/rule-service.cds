@@ -25,6 +25,11 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
+    entity ObjectTypes    as projection on codeRules.ObjectType;
+
+    @Capabilities.InsertRestrictions.Insertable: false
+    @Capabilities.UpdateRestrictions.Updatable : false
+    @Capabilities.DeleteRestrictions.Deletable : false
     entity BaseRules      as
         projection on codeRules.BaseRule {
             ID,

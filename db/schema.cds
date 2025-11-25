@@ -2,9 +2,14 @@ namespace codeRules;
 
 using {
     cuid,
-    managed
+    managed,
 } from '@sap/cds/common';
 
+
+entity ObjectType {
+    key code : String(6)
+
+}
 
 @assert.unique: {ruleTemplate: [
     objectType,
@@ -13,7 +18,7 @@ using {
 ]}
 entity BaseRule : cuid, managed {
     @mandatory
-    objectType     : String(10);
+    objectType     : Association to one ObjectType;
 
     @mandatory
     ruleType       : Association to one RuleType;
@@ -48,7 +53,7 @@ entity CodeUser : managed {
                       on rules.user = $self;
 
         @mandatory
-        trusted : Boolean;
+        trusted : Boolean default false;
 }
 
 @assert.unique: {AutomationLogEntry: [

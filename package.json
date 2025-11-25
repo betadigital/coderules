@@ -23,7 +23,9 @@
     "watch-baseruleapp": "cds watch --open baseruleapp/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-userrulesapp": "cds watch --open userrulesapp/index.html?sap-ui-xx-viewCache=false --livereload false",
     "start:router": "npm --prefix app/router start",
+    "devBuild": "npm install --prefix app/router",
     "devRouter": "cds bind --exec -- npm run start:router",
+    "devStart": "npm run devBuild && npm run devRouter",
     "watch-logsapp": "cds watch --open logsapp/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,

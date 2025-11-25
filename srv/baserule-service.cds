@@ -3,7 +3,7 @@ using {codeRules} from '../db/schema';
 service BaseRuleService @(path: '/baseRuleService') {
 
 
-    entity RuleTypes           as
+    entity RuleTypes   as
         projection on codeRules.RuleType {
             code,
             @readonly
@@ -11,35 +11,33 @@ service BaseRuleService @(path: '/baseRuleService') {
         };
 
 
-    @Common.Label: 'Object Type'
-    entity DistinctObjectTypes as
-        select from codeRules.BaseRule {
-                @Common.Label: 'Object Type'
-            key objectType
-        }
-        group by
-            objectType;
+    @Capabilities.InsertRestrictions.Insertable: false
+    @Capabilities.InsertRestrictions.Deletable : false
+    entity ObjectTypes as projection on codeRules.ObjectType;
 
 
     @odata.draft.enabled
-    entity BaseRules           as
+    entity BaseRules   as
         projection on codeRules.BaseRule {
             ID,
-            @(Common.ValueList: {
-                CollectionPath: 'DistinctObjectTypes',
-                Parameters    : [{
-                    $Type            : 'Common.ValueListParameterInOut',
-                    LocalDataProperty: 'objectType',
-                    // The field we are editing
-                    ValueListProperty: 'objectType' // The field from the suggestion list
-                }]
-            })
-            objectType,
             value,
             createdAt,
             createdBy  as Author,
             modifiedAt,
             modifiedBy as EditedBy,
+            @(
+                Common.ValueListWithFixedValues: true,
+                Common.ValueList               : {
+                    CollectionPath: 'ObjectTypes',
+                    Parameters    : [{
+                        $Type            : 'Common.ValueListParameterInOut',
+                        LocalDataProperty: 'objectType_code',
+                        ValueListProperty: 'code'
+                    },
+
+                    ]
+                }
+            ) objectType : redirected to ObjectTypes,
 
             @(
                 Common.ValueListWithFixedValues: true,

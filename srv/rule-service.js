@@ -5,12 +5,6 @@ module.exports = (srv) => {
   // Get the entities from your service definition (the projections)
   const { UserRules, BaseRules, CodeUsers, AutomationLogs } = srv.entities;
 
-  srv.before("CREATE", CodeUsers, (req) => {
-    // Only set it to false if the user didn't provide a value
-    if (req.data.trusted === undefined || req.data.trusted === null) {
-      req.data.trusted = false;
-    }
-  });
 
   srv.before("*", async (req) => {
     // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
