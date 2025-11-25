@@ -11,6 +11,7 @@ service RuleService @(path: '/codeRuleService') {
         effectiveDate       : Date;
         endDate             : Date;
         user_ID             : String;
+        baseRule_severityRating: Int16;
     }
 
 
