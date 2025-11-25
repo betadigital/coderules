@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: code-review-rules
-version: 1.0.0
+version: 1.5.0
 description: "CAP Project with Fiori Frontend and Full AuthZ/AuthN"
 parameters:
   enable-parallel-deployments: true
