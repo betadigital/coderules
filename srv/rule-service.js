@@ -5,11 +5,11 @@ module.exports = (srv) => {
   // Get the entities from your service definition (the projections)
   const { UserRules, BaseRules, CodeUsers, AutomationLogs } = srv.entities;
 
-
   srv.before("*", async (req) => {
     // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
     console.log(
-      `[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${req.target ? req.target.name : "unknown"
+      `[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${
+        req.target ? req.target.name : "unknown"
       }`
     );
     if (req.user) {
@@ -35,7 +35,8 @@ module.exports = (srv) => {
       ruleType,
       value,
       result,
-      objectName, severity
+      objectName,
+      severity,
     } = req.data;
 
     if (
@@ -83,9 +84,11 @@ module.exports = (srv) => {
       };
       await tx.run(INSERT.into(BaseRules).entries(rulePayload));
       existingRule = await tx.run(
-        SELECT.one
-          .from(BaseRules)
-          .where({ objectType: objectType, ruleType_code: ruleType, value: value })
+        SELECT.one.from(BaseRules).where({
+          objectType: objectType,
+          ruleType_code: ruleType,
+          value: value,
+        })
       );
     }
     const payloadUser = { ID: user };
@@ -97,7 +100,7 @@ module.exports = (srv) => {
       baseRule: existingRule,
       result: result.toUpperCase(),
       severity: severity,
-      objectName: objectName
+      objectName: objectName,
     };
     const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
 
@@ -116,6 +119,7 @@ module.exports = (srv) => {
           b.ID,
             b.objectType,
             b.value,
+            b.severityRating,
             b.ruleType((rt) => {
               rt.code, rt.description;
             });
@@ -131,6 +135,7 @@ module.exports = (srv) => {
       return [];
     }
 
+    console.log("Rules are :", rules);
     return rules.map((rule) => {
       // Handle cases where baseRule or ruleType might be null
       const baseRule = rule.baseRule || {};
