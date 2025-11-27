@@ -67,42 +67,47 @@ module.exports = (srv) => {
     ) {
       return req.error(400, `Result ${result} invalid.`);
     }
-    const tx = cds.tx(req);
-    let existingRule = await tx.run(
-      SELECT.one
-        .from(BaseRules)
-        .where({ objectType: objectType, ruleType: ruleType, value: value })
-    );
-    console.log(existingRule);
-    if (!existingRule) {
-      // Create this rule if it doesnt exist.
-      const rulePayload = {
-        objectType: objectType,
-        ruleType_code: ruleType,
-        value: value,
-        severityRating: 1,
-      };
-      await tx.run(INSERT.into(BaseRules).entries(rulePayload));
-      existingRule = await tx.run(
-        SELECT.one.from(BaseRules).where({
-          objectType: objectType,
+
+    try {
+      const tx = cds.tx(req);
+      let existingRule = await tx.run(
+        SELECT.one
+          .from(BaseRules)
+          .where({ objectType: objectType, ruleType: ruleType, value: value })
+      );
+      console.log(existingRule);
+      if (!existingRule) {
+        // Create this rule if it doesnt exist.
+        const rulePayload = {
+          objectType_code: objectType,
           ruleType_code: ruleType,
           value: value,
-        })
-      );
-    }
-    const payloadUser = { ID: user };
+          severityRating: 1,
+        };
+        await tx.run(INSERT.into(BaseRules).entries(rulePayload));
+        existingRule = await tx.run(
+          SELECT.one.from(BaseRules).where({
+            objectType: objectType,
+            ruleType_code: ruleType,
+            value: value,
+          })
+        );
+      }
+      const payloadUser = { ID: user };
 
-    const payload = {
-      user: payloadUser,
-      transportRequest: transportRequest,
-      checkDate: checkDate,
-      baseRule: existingRule,
-      result: result.toUpperCase(),
-      severity: severity,
-      objectName: objectName,
-    };
-    const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
+      const payload = {
+        user: payloadUser,
+        transportRequest: transportRequest,
+        checkDate: checkDate,
+        baseRule: existingRule,
+        result: result.toUpperCase(),
+        severity: severity,
+        objectName: objectName,
+      };
+      const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
+    } catch (err) {
+      return req.error(500, err.message);
+    }
 
     return `Successfully inserted AutomationLog.`;
   });

@@ -1,9 +1,26 @@
 using {RuleService} from './rule-service';
 
-annotate RuleService.AutomationLogs with @(restrict: [{
-    grant: '*',
-    to   : '*'
-}]);
+annotate RuleService.AutomationLogs with @(restrict: [
+    {
+        grant: '*',
+        to   : 'Admin'
+    },
+    {
+        grant: [
+            'UPDATE',
+            'CREATE',
+            'READ'
+        ],
+        to   : ['RuleM2M']
+    },
+    {
+        grant: ['READ'],
+        to   : [
+            'authenticated-user',
+            'RuleReader'
+        ]
+    }
+]);
 
 
 annotate RuleService.CodeUsers with @(restrict: [
