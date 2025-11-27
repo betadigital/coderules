@@ -1,5 +1,11 @@
 using {RuleService} from './rule-service';
 
+annotate RuleService.AutomationLogs with @(restrict: [{
+    grant: '*',
+    to   : '*'
+}]);
+
+
 annotate RuleService.CodeUsers with @(restrict: [
     {
         grant: '*',
