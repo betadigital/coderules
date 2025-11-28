@@ -12,13 +12,13 @@ service RuleService @(path: '/codeRuleService') {
         endDate                 : Date;
         user_ID                 : String;
         baseRule_severityRating : Int16;
-        user_isTrusted : Boolean;
+        user_isTrusted          : Boolean;
     }
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity RuleTypes           as
+    entity RuleTypes      as
         projection on codeRules.RuleType {
             // --- LABELS & DROPDOWN FORMATTING ---
             // 1. Add Labels here to show in the column headers
@@ -36,22 +36,23 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity ObjectTypes         as projection on codeRules.ObjectType;
+    entity ObjectTypes    as projection on codeRules.ObjectType;
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity BaseRules           as
+    entity BaseRules      as
         projection on codeRules.BaseRule {
             ID,
-            
+
             @(
                 Common.ValueListWithFixedValues: true,
                 Common.ValueList               : {
                     CollectionPath: 'ObjectTypes',
                     Parameters    : [{
                         $Type            : 'Common.ValueListParameterInOut',
-                        LocalDataProperty: 'objectType', // Point to Association
+                        LocalDataProperty: 'objectType',
+                        // Point to Association
                         ValueListProperty: 'code'
                     }]
                 }
@@ -81,7 +82,8 @@ service RuleService @(path: '/codeRuleService') {
                     Parameters    : [
                         {
                             $Type            : 'Common.ValueListParameterInOut',
-                            LocalDataProperty: 'ruleType', // Point to Association
+                            LocalDataProperty: 'ruleType',
+                            // Point to Association
                             ValueListProperty: 'code'
                         },
                         {
@@ -91,13 +93,13 @@ service RuleService @(path: '/codeRuleService') {
                     ]
                 }
             )
-            ruleType : redirected to RuleTypes
+            ruleType   : redirected to RuleTypes
 
         };
 
-    @odata.draft.enabled
-    @Common.Label: 'Code User'
-    entity CodeUsers           as
+            @odata.draft.enabled
+            @Common.Label           : 'Code User'
+    entity CodeUsers      as
         projection on codeRules.CodeUser {
             @(
                 Common.Label  : 'User ID / Name',
@@ -110,13 +112,13 @@ service RuleService @(path: '/codeRuleService') {
             modifiedBy,
             rules,
             trusted,
-            
+
             // --- Calculated field for untrusted status (HANA Compatible) ---
             @Common.Label: 'Untrusted Status'
             cast(
                 case
                     when trusted = true
-                        then false
+                         then false
                     else true
                 end as Boolean
             ) as untrusted
@@ -124,9 +126,17 @@ service RuleService @(path: '/codeRuleService') {
         actions {
             // Only allow these actions when the entity is Active (Saved), not in Draft (Edit) mode.
             @Core.OperationAvailable: IsActiveEntity
+            @Common.SideEffects     : {TargetProperties: [
+                'in/trusted',
+                'in/untrusted'
+            ]}
             action makeTrusted()   returns CodeUsers;
 
             @Core.OperationAvailable: IsActiveEntity
+            @Common.SideEffects     : {TargetProperties: [
+                'in/trusted',
+                'in/untrusted'
+            ]}
             action makeUntrusted() returns CodeUsers;
         };
 
@@ -134,11 +144,11 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity AutomationLogs      as projection on codeRules.AutomationLog;
+    entity AutomationLogs as projection on codeRules.AutomationLog;
 
 
     // UserRules — child of CodeUser, draft handled by parent
-    entity UserRules           as
+    entity UserRules      as
         projection on codeRules.UserRule {
             ID,
             user,
@@ -152,7 +162,8 @@ service RuleService @(path: '/codeRuleService') {
                     {
                         // This maps the key for saving
                         $Type            : 'Common.ValueListParameterInOut',
-                        LocalDataProperty: 'baseRule', // Point to Association
+                        LocalDataProperty: 'baseRule',
+                        // Point to Association
                         ValueListProperty: 'ID'
                     },
                     {
@@ -180,23 +191,21 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    action   addLog(
-        user : String,
-        transportRequest : String,
-        checkDate : Date,
-        objectType : String,
-        ruleType : String,
-        value : String,
-        result : String,
-        objectName : String,
-        severity : Int16,
-    ) returns String;
+    action   addLog(user: String,
+                    transportRequest: String,
+                    checkDate: Date,
+                    objectType: String,
+                    ruleType: String,
+                    value: String,
+                    result: String,
+                    objectName: String,
+                    severity: Int16, )                        returns String;
 
-    function getApplicableRules(userId : String)               returns array of SimpleRule;
+    function getApplicableRules(userId: String)               returns array of SimpleRule;
 
-    function getAllRules(userId : String)                      returns array of SimpleRule;
+    function getAllRules(userId: String)                      returns array of SimpleRule;
 
-    function setTrustedUser(userId : String, trusted : Boolean) returns String;
+    function setTrustedUser(userId: String, trusted: Boolean) returns String;
 
-    action   checkForOverdueRules(userId : String)             returns String;
+    action   checkForOverdueRules(userId: String)             returns String;
 }
