@@ -48,6 +48,11 @@ annotate service.CodeUsers with @(
                 Value: modifiedBy,
                 Label: 'Modified by',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : trusted,
+                Label : 'Is Trusted?',
+            },
         ],
     },
     UI.FieldGroup #AdminInfo1: {
@@ -67,6 +72,34 @@ annotate service.CodeUsers with @(
             $Type: 'UI.DataField',
             Value: 'User page for a user with write-access to codebase',
         },
+        Title : {
+            $Type : 'UI.DataField',
+            Value : ID,
+        },
+    },
+    UI.Identification : [
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'RuleService.makeTrusted',
+            Label : '{i18n>TrustUser}',
+            @UI.Hidden : trusted,
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'RuleService.makeUntrusted',
+            Label : '{i18n>RevokeTrust}',
+            @UI.Hidden : untrusted,
+        },
+    ],
+    UI.FieldGroup #IsTrusted : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : trusted,
+                Label : 'trusted',
+            },
+        ],
     },
 );
 

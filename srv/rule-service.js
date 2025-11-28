@@ -26,6 +26,58 @@ module.exports = (srv) => {
     }
   });
 
+  /**
+   * Helper to handle trust updates and force UI refresh
+   */
+  const _updateTrustStatus = async (req, isTrusted) => {
+    // 1. FIX: Extract the ID string correctly from the key object
+    const { ID } = req.params[0];
+    const actionVerb = isTrusted ? "trusted" : "untrusted";
+
+    console.log(`Making user ${ID} ${actionVerb}.`);
+
+    try {
+      // 2. Update the Database Entity
+      // We use the DB entity (CodeUser) for the update to avoid projection issues
+      await cds.run(UPDATE("CodeUser", ID).with({ trusted: isTrusted }));
+
+      // 3. Select the updated record from the SERVICE PROJECTION (CodeUsers)
+      // We select from the Projection so that the 'untrusted' calculated field
+      // is automatically re-calculated by the database View/Projection.
+      const updatedUser = await cds.run(
+        SELECT.one.from(CodeUsers).where({ ID: ID })
+      );
+
+      // 4. Return the Object + Refresh Flag
+      // We must return the entity data so Fiori Elements can update the model immediately.
+      return {
+        ...updatedUser,
+        "@fiori.message": {
+          code: "",
+          message: `Successfully set user ${ID} to ${actionVerb}.`,
+          severity: "success",
+          target: ID,
+          refresh: true, // <--- Forces the Object Page to refresh
+        },
+      };
+    } catch (err) {
+      return req.error(500, `Failed to update user: ${err.message}`);
+    }
+  };
+
+  // --- Action Handlers ---
+
+  srv.on("makeTrusted", async (req) => {
+    return _updateTrustStatus(req, true);
+  });
+
+  srv.on("makeUntrusted", async (req) => {
+    return _updateTrustStatus(req, false);
+  });
+
+  /**
+   * Method to add a log via api call.
+   */
   srv.on("addLog", async (req) => {
     const {
       user,
@@ -135,7 +187,7 @@ module.exports = (srv) => {
   /**
    * Reusable function to flatten the query result.
    */
-  const _flattenRules = (rules, user) => {
+  const _flattenRules = (rules, user, isTrusted) => {
     if (!rules || rules.length === 0) {
       return [];
     }
@@ -156,6 +208,7 @@ module.exports = (srv) => {
         baseRule_ruleType_description: ruleType.description,
         user_ID: user,
         baseRule_severityRating: baseRule.severityRating,
+        user_isTrusted: isTrusted,
       };
     });
   };
@@ -190,9 +243,13 @@ module.exports = (srv) => {
 
     // Run the query
     const activeRulesResult = await tx.run(query);
+    const userRecord = await tx.run(
+      SELECT.one.from(CodeUsers).columns("trusted").where({ ID: userId })
+    );
+    const isTrusted = userRecord ? userRecord.trusted : false;
 
     // Flatten the result using the map helper
-    return _flattenRules(activeRulesResult, userId);
+    return _flattenRules(activeRulesResult, userId, isTrusted);
   });
 
   /**
@@ -214,9 +271,13 @@ module.exports = (srv) => {
 
     // 3. Run the query
     const allRulesResult = await tx.run(query);
+    const userRecord = await tx.run(
+      SELECT.one.from(CodeUsers).columns("trusted").where({ ID: userId })
+    );
+    const isTrusted = userRecord ? userRecord.trusted : false;
 
     // 4. Flatten the result using the map helper
-    return _flattenRules(allRulesResult, userId);
+    return _flattenRules(allRulesResult, userId, isTrusted);
   });
 
   srv.on("setTrustedUser", async (req) => {

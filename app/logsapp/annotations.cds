@@ -18,7 +18,7 @@ annotate service.AutomationLogs with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : baseRule.objectType,
+            Value : baseRule.objectType_code,
             Label : '{i18n>ObjectType}',
         },
         {
