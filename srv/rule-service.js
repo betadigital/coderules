@@ -208,7 +208,7 @@ module.exports = (srv) => {
         baseRule_ruleType_description: ruleType.description,
         user_ID: user,
         baseRule_severityRating: baseRule.severityRating,
-        user_isTrusted: isTrusted,
+        user_trusted: isTrusted,
       };
     });
   };
