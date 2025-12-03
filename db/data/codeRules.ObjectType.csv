@@ -1,8 +1,11 @@
-code
-PROG
-METH
-FUNC
-DDLS
-CLAS
-CINC
-BDEF
+code,description
+PROG,Program
+METH,Method
+FUNC,Function Module
+DDLS,Data Definition Language Source
+CLAS,Class (ABAP Objects)
+CINC,Class Include (ABAP Objects)
+BDEF,Behaviour Defintion
+CPUB,Public Header (ABAP Objects)
+CPRI,Private Header (ABAP Objects)
+CPRO,Protected Header (ABAP Objects)

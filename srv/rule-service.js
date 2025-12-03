@@ -30,25 +30,19 @@ module.exports = (srv) => {
    * Helper to handle trust updates and force UI refresh
    */
   const _updateTrustStatus = async (req, isTrusted) => {
-    // 1. FIX: Extract the ID string correctly from the key object
     const { ID } = req.params[0];
     const actionVerb = isTrusted ? "trusted" : "untrusted";
 
     console.log(`Making user ${ID} ${actionVerb}.`);
 
     try {
-      // 2. Update the Database Entity
-      // We use the DB entity (CodeUser) for the update to avoid projection issues
       await cds.run(UPDATE("CodeUser", ID).with({ trusted: isTrusted }));
 
-      // 3. Select the updated record from the SERVICE PROJECTION (CodeUsers)
-      // We select from the Projection so that the 'untrusted' calculated field
-      // is automatically re-calculated by the database View/Projection.
       const updatedUser = await cds.run(
         SELECT.one.from(CodeUsers).where({ ID: ID })
       );
 
-      // 4. Return the Object + Refresh Flag
+      // Return the Object + Refresh Flag
       // We must return the entity data so Fiori Elements can update the model immediately.
       return {
         ...updatedUser,
@@ -202,7 +196,7 @@ module.exports = (srv) => {
         effectiveDate: rule.effectiveDate,
         endDate: rule.endDate,
         baseRule_ID: baseRule.ID,
-        baseRule_objectType: baseRule.objectType,
+        baseRule_objectType: baseRule.objectType_code,
         baseRule_value: baseRule.value,
         baseRule_ruleType_code: ruleType.code,
         baseRule_ruleType_description: ruleType.description,

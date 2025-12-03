@@ -29,11 +29,16 @@ service BaseRuleService @(path: '/baseRuleService') {
                 Common.ValueListWithFixedValues: true,
                 Common.ValueList               : {
                     CollectionPath: 'ObjectTypes',
-                    Parameters    : [{
-                        $Type            : 'Common.ValueListParameterInOut',
-                        LocalDataProperty: 'objectType_code',
-                        ValueListProperty: 'code'
-                    },
+                    Parameters    : [
+                        {
+                            $Type            : 'Common.ValueListParameterInOut',
+                            LocalDataProperty: 'objectType_code',
+                            ValueListProperty: 'code'
+                        },
+                        {
+                            $Type            : 'Common.ValueListParameterDisplayOnly',
+                            ValueListProperty: 'description'
+                        }
 
                     ]
                 }

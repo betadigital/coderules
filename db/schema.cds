@@ -7,7 +7,8 @@ using {
 
 
 entity ObjectType {
-    key code : String(6)
+    key code : String(6);
+    description: String(33);
 
 }
 
