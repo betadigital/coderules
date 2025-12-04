@@ -223,26 +223,30 @@ module.exports = (srv) => {
     const today = new Date().toLocaleDateString("en-CA", {
       timeZone: "Australia/Sydney",
     });
-    //  Build the base query
+
+    // Build the base query
     const query = _buildSelectQuery();
 
-    // Add the WHERE clause for this function
+    console.log("trying deep filter");
+    // Add the WHERE clause with the deep filter
     query.where({
       user_ID: userId,
-      and: {
-        effectiveDate: { "<=": today },
-        endDate: { ">=": today },
-      },
+      effectiveDate: { "<=": today },
+      endDate: { ">=": today },
+      // DEEP FILTER: Navigate from UserRule -> BaseRule -> ObjectType -> Active
+      "baseRule.objectType.active": true,
     });
 
-    // Run the query
+    //  Run the query
     const activeRulesResult = await tx.run(query);
+
+    // Get User Trust status
     const userRecord = await tx.run(
       SELECT.one.from(CodeUsers).columns("trusted").where({ ID: userId })
     );
     const isTrusted = userRecord ? userRecord.trusted : false;
 
-    // Flatten the result using the map helper
+    // Return flattened results
     return _flattenRules(activeRulesResult, userId, isTrusted);
   });
 
@@ -257,13 +261,13 @@ module.exports = (srv) => {
 
     const tx = cds.tx(req);
 
-    // 1. Build the base query
+    //  Build the base query
     const query = _buildSelectQuery();
 
-    // 2. Add the WHERE clause for this function
+    // Add the WHERE clause for this function
     query.where({ user_ID: userId });
 
-    // 3. Run the query
+    //  Run the query
     const allRulesResult = await tx.run(query);
     const userRecord = await tx.run(
       SELECT.one.from(CodeUsers).columns("trusted").where({ ID: userId })
