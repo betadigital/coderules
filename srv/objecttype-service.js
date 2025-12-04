@@ -25,28 +25,28 @@ module.exports = (srv) => {
   });
 
   srv.on("makeActive", ObjectTypes, async (req) => {
-    const [code] = req.params;
+    await cds.run(UPDATE(req.subject).with({ active: true }));
 
-    try {
-      await cds.run(UPDATE(ObjectTypes, code.code).with({ active: true }));
-    } catch (err) {
-      return req.error(
-        400,
-        `Could not make Object Type active: ${err.message}`
-      );
-    }
+    const updatedObject = await cds.run(SELECT.one.from(req.subject));
+
+    req.notify({
+      message: `Successfully set ObjectType ${updatedObject.code} to active.`,
+      type: "success",
+    });
+
+    return updatedObject;
   });
 
-  srv.on("makeInactive", ObjectTypes, async (req) => {
-    const [code] = req.params;
+  srv.on("makeActive", ObjectTypes, async (req) => {
+    await cds.run(UPDATE(req.subject).with({ active: false }));
 
-    try {
-      await cds.run(UPDATE(ObjectTypes, code.code).with({ active: false }));
-    } catch (err) {
-      return req.error(
-        400,
-        `Could not make Object Type active: ${err.message}`
-      );
-    }
+    const updatedObject = await cds.run(SELECT.one.from(req.subject));
+
+    req.notify({
+      message: `Successfully set ObjectType ${updatedObject.code} to inactive.`,
+      type: "success",
+    });
+
+    return updatedObject;
   });
 };

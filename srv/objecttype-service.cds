@@ -10,9 +10,9 @@ service ObjectTypeService @(path: '/objectTypeService') {
         }
         actions {
             @Common.SideEffects: {TargetProperties: ['active']}
-            action makeActive()   returns String;
+            action makeActive()   returns ObjectTypes;
             @Common.SideEffects: {TargetProperties: ['active']}
-            action makeInactive() returns String;
+            action makeInactive() returns ObjectTypes;
         };
 
 
