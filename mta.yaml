@@ -86,6 +86,10 @@ modules:
           artifacts:
             - logsapp.zip
           target-path: resources/
+        - name: codereviewrulesobjecttypes
+          artifacts:
+            - objecttypes.zip
+          target-path: resources/
 
   - name: codereviewrulesbaseruleapp
     type: html5
@@ -112,6 +116,16 @@ modules:
   - name: codereviewruleslogsapp
     type: html5
     path: app/logsapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
+  - name: codereviewrulesobjecttypes
+    type: html5
+    path: app/objecttypes
     build-parameters:
       build-result: dist
       builder: custom

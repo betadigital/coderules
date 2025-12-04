@@ -3,27 +3,31 @@
   "routes": [
     {
       "source": "^/baseruleapp/(.*)$",
-      "target": "$1",
-      "localDir": "../baseruleapp/webapp",
-      "authenticationType": "xsuaa"
+      "target": "/$1",
+      "destination": "baseruleapp",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
     },
     {
       "source": "^/userrulesapp/(.*)$",
-      "target": "$1",
-      "localDir": "../userrulesapp/webapp",
-      "authenticationType": "xsuaa"
+      "target": "/$1",
+      "destination": "userrulesapp",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
     },
     {
       "source": "^/logsapp/(.*)$",
-      "target": "$1",
-      "localDir": "../logsapp/webapp",
-      "authenticationType": "xsuaa"
+      "target": "/$1",
+      "destination": "logsapp",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
     },
     {
       "source": "^/objecttypes/(.*)$",
-      "target": "$1",
-      "localDir": "../objecttypes/webapp",
-      "authenticationType": "xsuaa"
+      "target": "/$1",
+      "destination": "objecttypes",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
     },
     {
       "source": "^/resources/(.*)$",

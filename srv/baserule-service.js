@@ -2,7 +2,7 @@ const cds = require("@sap/cds");
 const { SELECT, INSERT } = require("@sap/cds/lib/ql/cds-ql");
 
 module.exports = (srv) => {
-  const { BaseRules, ObjectTypes, ExcludedObjectTypes } = srv.entities;
+  const { BaseRules } = srv.entities;
 
   srv.before("*", async (req) => {
     // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
@@ -146,10 +146,7 @@ module.exports = (srv) => {
       for (const r of rules) {
         const key = `${r.objectType}::${r.ruleType}::${r.value}`;
         if (seen.has(key))
-          return req.error(
-            409,
-            `Duplicate detected within uploaded file: (${key})`
-          );
+          return req.error(409, `Duplicate detected within uploaded file: (${key})`);
         seen.add(key);
       }
       console.log("CP4");
@@ -157,13 +154,11 @@ module.exports = (srv) => {
       const existing = [];
       for (let i = 0; i < rules.length; i++) {
         const [entry] = await tx.run(
-          SELECT.from(BaseRules)
-            .columns("objectType", "ruleType", "value")
-            .where({
-              objectType: rules[i].objectType,
-              ruleType: rules[i].ruleType,
-              value: rules[i].value,
-            })
+          SELECT.from(BaseRules).columns("objectType", "ruleType", "value").where({
+            objectType: rules[i].objectType,
+            ruleType: rules[i].ruleType,
+            value: rules[i].value,
+          })
         );
         if (entry) {
           existing.push(entry);

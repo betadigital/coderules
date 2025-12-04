@@ -56,6 +56,13 @@
       "csrfProtection": false
     },
     {
+      "source": "^/objectTypeService/(.*)$",
+      "target": "/objectTypeService/$1",
+      "destination": "srv-api",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
       "source": "^/(.*)$",
       "target": "$1",
       "localDir": "webapp",
