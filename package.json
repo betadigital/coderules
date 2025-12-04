@@ -39,7 +39,7 @@
         },
         "auth": {
           "kind": "xsuaa-auth",
-          "service": "code-rules-xsuaa",
+          "service": "code-review-rules-auth",
           "enforce": true
         }
       },
@@ -50,7 +50,6 @@
         },
         "auth": {
           "kind": "xsuaa-auth",
-          "service": "code-rules-xsuaa",
           "enforce": true
         }
       },

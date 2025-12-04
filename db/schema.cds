@@ -6,11 +6,17 @@ using {
 } from '@sap/cds/common';
 
 
+@assert.unique: {objectTypeTemplate: [
+    code,
+    description
+]}
 entity ObjectType {
-    key code : String(6);
-    description: String(33);
+    key code        : String(6);
+        description : String(33);
+        active      : Boolean;
 
 }
+
 
 @assert.unique: {ruleTemplate: [
     objectType,

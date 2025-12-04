@@ -6,13 +6,13 @@ service RuleService @(path: '/codeRuleService') {
     type SimpleRule {
         baserule_ID             : String;
         baserule_objectType     : String;
-        baserule_ruletype       : String; 
+        baserule_ruletype       : String;
         baserule_value          : String;
         effectiveDate           : Date;
         endDate                 : Date;
         user_ID                 : String;
         baseRule_severityRating : Int16;
-        user_trusted          : Boolean;
+        user_trusted            : Boolean;
     }
 
 
@@ -35,9 +35,9 @@ service RuleService @(path: '/codeRuleService') {
     entity BaseRules      as
         projection on codeRules.BaseRule {
             ID,
-            @Common.Label : 'Object Type'
+            @Common.Label: 'Object Type'
             objectType,
-            
+
             @Common.Label: 'Value'
             value,
             severityRating,
@@ -67,8 +67,8 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    @odata.draft.enabled
-    @Common.Label: 'Code User'
+            @odata.draft.enabled
+            @Common.Label           : 'Code User'
     entity CodeUsers      as
         projection on codeRules.CodeUser {
             @(
@@ -135,12 +135,12 @@ service RuleService @(path: '/codeRuleService') {
                     {
                         // First display column: Object type code
                         $Type            : 'Common.ValueListParameterDisplayOnly',
-                        ValueListProperty: 'objectType_code' 
+                        ValueListProperty: 'objectType_code'
                     },
                     {
                         // display column: Rule Code
                         $Type            : 'Common.ValueListParameterDisplayOnly',
-                        ValueListProperty: 'ruleType_code' 
+                        ValueListProperty: 'ruleType_code'
                     },
                     {
                         // display column: Rule Description

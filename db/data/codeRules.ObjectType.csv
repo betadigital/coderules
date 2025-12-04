@@ -1,11 +1,13 @@
-code,description
-PROG,Program
-METH,Method
-FUNC,Function Module
-DDLS,Data Definition Language Source
-CLAS,Class (ABAP Objects)
-CINC,Class Include (ABAP Objects)
-BDEF,Behaviour Defintion
-CPUB,Public Header (ABAP Objects)
-CPRI,Private Header (ABAP Objects)
-CPRO,Protected Header (ABAP Objects)
+code,description,active
+PROG,Program,true
+METH,Method,true
+FUNC,Function Module,true
+DDLS,Data Definition Language Source,true
+CLAS,Class (ABAP Objects),true
+CINC,Class Include (ABAP Objects),true
+BDEF,Behaviour Defintion,true
+CPUB,Public Header (ABAP Objects),true
+CPRI,Private Header (ABAP Objects),true
+CPRO,Protected Header (ABAP Objects),true
+FAKE,Testing 1,false
+FAUX,Testing 2,false

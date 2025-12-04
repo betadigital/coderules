@@ -12,8 +12,11 @@ service BaseRuleService @(path: '/baseRuleService') {
 
 
     @Capabilities.InsertRestrictions.Insertable: false
-    @Capabilities.InsertRestrictions.Deletable : false
-    entity ObjectTypes as projection on codeRules.ObjectType;
+    @Capabilities.DeleteRestrictions.Deletable : false
+    entity ObjectTypes as
+        projection on codeRules.ObjectType {
+            *
+        };
 
 
     @odata.draft.enabled
