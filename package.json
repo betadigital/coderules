@@ -40,7 +40,7 @@
         },
         "auth": {
           "kind": "xsuaa-auth",
-          "service": "code-review-rules-auth",
+          "service": "code-review-rules-auth-v2",
           "enforce": true
         }
       },
