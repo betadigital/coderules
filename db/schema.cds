@@ -12,8 +12,10 @@ using {
 ]}
 entity ObjectType {
     key code        : String(6);
-        description : String(33);
+        description : String(50);
+        programId :  String(6);
         active      : Boolean;
+        manual: Boolean;
 
 }
 
