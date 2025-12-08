@@ -59,16 +59,16 @@ service ObjectTypeService @(path: '/objectTypeService') {
             ]
         }
         code : codeRules.ObjectType:code
-    ) returns ObjectTypes;
+    );
 
 }
 
 // -----------------------------------------------------------------------------
-// Side Effects for Unbound Action 
+// Side Effects for Unbound Action. Hard force update.
 // -----------------------------------------------------------------------------
 annotate ObjectTypeService.addProgrammableType with @Common.SideEffects : {
     TargetEntities : [
-        ObjectTypeService.ObjectTypes, 
-        ObjectTypeService.ManualObjectTypes
+        '/ObjectTypeService.EntityContainer/ObjectTypes',
+        '/ObjectTypeService.EntityContainer/ManualObjectTypes'
     ]
 };

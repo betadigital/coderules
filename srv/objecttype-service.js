@@ -34,21 +34,16 @@ module.exports = (srv) => {
 
     if (!code) return req.error(400, "Code parameter is required");
 
-    // 1. Update the record in the database
-    // We set manual = false.
-    // Note: We use the base entity 'ObjectType' to ensure we hit the table directly.
     const n = await UPDATE(ObjectType).set({ manual: false }).where({ code: code });
 
     if (n === 0) {
       return req.error(404, `Object Type with code '${code}' not found.`);
     }
 
-    // 2. Return the updated record
-    // The UI needs the returned data to update its internal model
-    // and to know the action was successful.
     const retVal = await SELECT.one.from(ObjectType).where({ code: code });
     console.log(retVal);
-    return retVal;
+    // Return null to force hard refresh
+    return;
   });
 
   /**
@@ -60,9 +55,8 @@ module.exports = (srv) => {
 
     if (!code) return req.error(400, "Could not identify Object Type");
 
-    // Update DB:
     // 1. Set manual = true (moves it back to Manual pool)
-    // 2. Set active = false
+    // 2. Set active = false (may need to change to true depending on desired spec)
     const n = await UPDATE(ObjectType)
       .set({ manual: true, active: false })
       .where({ code: code });
