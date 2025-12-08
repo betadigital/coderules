@@ -16,7 +16,7 @@ service BaseRuleService @(path: '/baseRuleService') {
     entity ObjectTypes as
         projection on codeRules.ObjectType {
             *
-        };
+        }where manual = false;
 
 
     @odata.draft.enabled

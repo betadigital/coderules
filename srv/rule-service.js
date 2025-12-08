@@ -76,6 +76,7 @@ module.exports = (srv) => {
     const {
       user,
       transportRequest,
+      subRequest,
       checkDate,
       objectType,
       ruleType,
@@ -88,6 +89,7 @@ module.exports = (srv) => {
     if (
       !user ||
       !transportRequest ||
+      !subRequest ||
       !checkDate ||
       !objectType ||
       !ruleType ||
@@ -144,6 +146,7 @@ module.exports = (srv) => {
       const payload = {
         user: payloadUser,
         transportRequest: transportRequest,
+        subRequest: subRequest,
         checkDate: checkDate,
         baseRule: existingRule,
         result: result.toUpperCase(),

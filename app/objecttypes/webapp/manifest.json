@@ -7,7 +7,7 @@
     "applicationVersion": {
       "version": "0.0.1"
     },
-    "title": "{{appTitle}}",
+    "title": "Object Types App",
     "description": "{{appDescription}}",
     "resources": "resources.json",
     "sourceTemplate": {
@@ -93,12 +93,17 @@
         {
           "pattern": ":?query:",
           "name": "ObjectTypesList",
-          "target": ["ObjectTypesList"]
+          "target": [
+            "ObjectTypesList"
+          ]
         },
         {
           "pattern": "ObjectTypes({key}):?query:",
           "name": "ObjectTypesObjectPage",
-          "target": ["ObjectTypesList", "ObjectTypesObjectPage"]
+          "target": [
+            "ObjectTypesList",
+            "ObjectTypesObjectPage"
+          ]
         }
       ],
       "targets": {
@@ -124,6 +129,20 @@
                   "tableSettings": {
                     "type": "ResponsiveTable",
                     "selectionMode": "Multi"
+                  }
+                },
+                "@com.sap.vocabularies.UI.v1.LineItem#ListInactive": {
+                  "actions": {
+                    "DataFieldForAction::ObjectTypeService.makeManual": {
+                      "enableOnSelect": "multi"
+                    }
+                  }
+                },
+                "@com.sap.vocabularies.UI.v1.LineItem#ListActive": {
+                  "actions": {
+                    "DataFieldForAction::ObjectTypeService.makeManual": {
+                      "enableOnSelect": "multi"
+                    }
                   }
                 }
               },

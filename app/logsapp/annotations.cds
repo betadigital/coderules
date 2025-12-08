@@ -13,6 +13,11 @@ annotate service.AutomationLogs with @(
         },
         {
             $Type : 'UI.DataField',
+            Value : subRequest,
+            Label : '{i18n>SubRequest}',
+        },
+        {
+            $Type : 'UI.DataField',
             Value : checkDate,
             Label : '{i18n>CheckDate}',
         },
@@ -67,6 +72,11 @@ annotate service.AutomationLogs with @(
                 $Type : 'UI.DataField',
                 Value : transportRequest,
                 Label : 'Transport Request',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : subRequest,
+                Label : '{i18n>SubRequest}',
             },
             {
                 $Type : 'UI.DataField',

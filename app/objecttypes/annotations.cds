@@ -55,7 +55,17 @@ annotate service.ObjectTypes with @(
             Action            : 'ObjectTypeService.makeActive',
             Label             : 'Make Active',
             InvocationGrouping: #ChangeSet
-        }
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.EntityContainer/addProgrammableType',
+            Label : '{i18n>AddObjectType}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeManual',
+            Label : '{i18n>MakeManual}',
+        },
     ],
 
     // -----------------------------------------------------------------------
@@ -82,7 +92,17 @@ annotate service.ObjectTypes with @(
             Action            : 'ObjectTypeService.makeInactive',
             Label             : 'Make Inactive',
             InvocationGrouping: #ChangeSet
-        }
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.EntityContainer/addProgrammableType',
+            Label : '{i18n>AddObjectType}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeManual',
+            Label : '{i18n>MakeManual}',
+        },
     ],
 
     // -----------------------------------------------------------------------

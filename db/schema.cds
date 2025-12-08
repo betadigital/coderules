@@ -8,12 +8,12 @@ using {
 
 @assert.unique: {objectTypeTemplate: [
     code,
-    description
+    programId,
 ]}
 entity ObjectType {
-    key code        : String(6);
-        description : String(50);
-        programId :  String(6);
+    key code        : String(5);
+        description : String(75);
+     programId :  String(5);
         active      : Boolean;
         manual: Boolean;
 
@@ -75,6 +75,7 @@ entity AutomationLog : cuid {
 
     user             : Association to one CodeUser;
     transportRequest : String(20);
+    subRequest: String (20);
     checkDate        : Date;
     baseRule         : Association to one BaseRule;
     objectName       : String(200);
