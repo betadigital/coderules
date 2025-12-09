@@ -15,6 +15,21 @@ service RuleService @(path: '/codeRuleService') {
         user_trusted            : Boolean;
     }
 
+    type Log {
+
+        user             : String;
+        transportRequest : String;
+        subRequest       : String;
+        checkdate        : Date;
+        objectType       : String;
+        ruletype         : String;
+        value            : String;
+        result           : String;
+        objectname       : String;
+        severity         : Int16;
+
+    }
+
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
@@ -27,7 +42,9 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity ObjectTypes    as projection on codeRules.ObjectType where manual = false;
+    entity ObjectTypes    as projection on codeRules.ObjectType
+                             where
+                                 manual = false;
 
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
@@ -162,16 +179,7 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    action   addLog(user: String,
-                    transportRequest: String,
-                    subRequest: String,
-                    checkDate: Date,
-                    objectType: String,
-                    ruleType: String,
-                    value: String,
-                    result: String,
-                    objectName: String,
-                    severity: Int16, )                        returns String;
+    action   addLog(logs: array of Log)                       returns String;
 
     function getApplicableRules(userId: String)               returns array of SimpleRule;
 

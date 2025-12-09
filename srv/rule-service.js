@@ -72,93 +72,113 @@ module.exports = (srv) => {
   /**
    * Method to add a log via api call.
    */
-  srv.on("addLog", async (req) => {
-    const {
-      user,
-      transportRequest,
-      subRequest,
-      checkDate,
-      objectType,
-      ruleType,
-      value,
-      result,
-      objectName,
-      severity,
-    } = req.data;
+  srv.on("addLogs", async (req) => {
+    //  Get the array of logs from the request data
+    const logs = req.data.logs;
 
-    if (
-      !user ||
-      !transportRequest ||
-      !subRequest ||
-      !checkDate ||
-      !objectType ||
-      !ruleType ||
-      !value ||
-      !result ||
-      !severity ||
-      !objectName
-    ) {
+    if (!logs || !Array.isArray(logs) || logs.length === 0) {
       return req.error(
         400,
-        `One (or more) of the required fields is invalid.
-                Received: userId: ${user}, transportRequest: ${transportRequest}, checkDate: ${checkDate}, objectType: ${objectType}, 
-                ruleType: ${ruleType}, value: ${value}, result: ${result}`
+        "The request body must contain a non-empty array of logs."
       );
     }
 
-    console.log(result.toLowerCase().trim());
-    if (
-      !(
-        result.toLowerCase().trim() == "pass" ||
-        result.toLowerCase().trim() == "fail"
-      )
-    ) {
-      return req.error(400, `Result ${result} invalid.`);
-    }
+    const failedIndices = [];
+    let successfulCount = 0;
 
-    try {
-      const tx = cds.tx(req);
-      let existingRule = await tx.run(
-        SELECT.one
-          .from(BaseRules)
-          .where({ objectType: objectType, ruleType: ruleType, value: value })
-      );
-      console.log(existingRule);
-      if (!existingRule) {
-        // Create this rule if it doesnt exist.
-        const rulePayload = {
-          objectType_code: objectType,
-          ruleType_code: ruleType,
-          value: value,
-          severityRating: 1,
-        };
-        await tx.run(INSERT.into(BaseRules).entries(rulePayload));
-        existingRule = await tx.run(
-          SELECT.one.from(BaseRules).where({
-            objectType: objectType,
-            ruleType_code: ruleType,
-            value: value,
-          })
+    // Iterate through each log object with its index
+    for (let i = 0; i < logs.length; i++) {
+      const log = logs[i];
+
+      // Use a self-contained try/catch block for each individual log
+      try {
+        const {
+          user,
+          transportRequest,
+          subRequest,
+          checkDate,
+          objectType,
+          ruleType,
+          value,
+          result,
+          objectName,
+          severity,
+        } = log;
+
+        // ---  Validation Check ---
+        if (
+          !user ||
+          !transportRequest ||
+          !subRequest ||
+          !checkDate ||
+          !objectType ||
+          !ruleType ||
+          !value ||
+          !result ||
+          !severity ||
+          !objectName
+        ) {
+          // If validation fails, skip this log and record the index
+          throw new Error("Missing required field(s).");
+        }
+
+        // --- Result Value Check ---
+        const cleanResult = result.toLowerCase().trim();
+        if (!(cleanResult === "pass" || cleanResult === "fail")) {
+          throw new Error(`Result '${result}' is invalid.`);
+        }
+
+        // --- Database Operations (Execute within a new transaction) ---
+
+        let existingRule = await cds.run(
+          SELECT.one
+            .from(BaseRules)
+            .where({ objectType: objectType, ruleType: ruleType, value: value })
         );
-      }
-      const payloadUser = { ID: user };
 
-      const payload = {
-        user: payloadUser,
-        transportRequest: transportRequest,
-        subRequest: subRequest,
-        checkDate: checkDate,
-        baseRule: existingRule,
-        result: result.toUpperCase(),
-        severity: severity,
-        objectName: objectName,
-      };
-      const newLog = await tx.run(INSERT.into(AutomationLogs).entries(payload));
-    } catch (err) {
-      return req.error(500, err.message);
+        if (!existingRule) {
+          // throw error to escape loop
+          throw new Error(
+            `Rule ${objectType}, ${ruleType}, ${value} does not exist.`
+          );
+        }
+
+        // Prepare the final payload for the AutomationLog
+        const payload = {
+          user: { ID: user }, // Ensure association structure is correct
+          transportRequest: transportRequest,
+          subRequest: subRequest,
+          checkDate: checkDate,
+          baseRule: existingRule,
+          result: cleanResult.toUpperCase(),
+          severity: severity,
+          objectName: objectName,
+        };
+
+        // Insert the log
+        await cds.run(INSERT.into(AutomationLogs).entries(payload));
+
+        successfulCount++; // Increment count on success
+      } catch (err) {
+        // Catch any errors (validation or DB errors) for this specific log
+        console.error(
+          `Failed to process log at index ${i}. Error: ${err.message}`
+        );
+        failedIndices.push(i);
+      }
     }
 
-    return `Successfully inserted AutomationLog.`;
+    // --- Return Summary String ---
+    const totalLogs = logs.length;
+    let message = `${successfulCount} of ${totalLogs} logs added successfully.`;
+
+    if (failedIndices.length > 0) {
+      message += `\nFailed indices: [${failedIndices.join(
+        ", "
+      )}]. See backend logs for details.`;
+    }
+
+    return message;
   });
 
   /**
