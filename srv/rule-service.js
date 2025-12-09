@@ -74,7 +74,9 @@ module.exports = (srv) => {
    */
   srv.on("addLogs", async (req) => {
     //  Get the array of logs from the request data
-    const logs = req.data.logs;
+    console.log("YOU HAVE SUCCESSFULLY CALLED ADD LOGS!");
+    const { logs } = req.data;
+    console.log("Logs are... ", logs);
 
     if (!logs || !Array.isArray(logs) || logs.length === 0) {
       return req.error(
@@ -130,6 +132,7 @@ module.exports = (srv) => {
 
         // --- Database Operations (Execute within a new transaction) ---
 
+        console.log("cp1");
         let existingRule = await cds.run(
           SELECT.one
             .from(BaseRules)
@@ -137,10 +140,26 @@ module.exports = (srv) => {
         );
 
         if (!existingRule) {
+          console.log("cp2");
           // throw error to escape loop
-          throw new Error(
-            `Rule ${objectType}, ${ruleType}, ${value} does not exist.`
-          );
+          if (!existingRule) {
+            // Create this rule if it doesnt exist.
+            const rulePayload = {
+              objectType_code: objectType,
+              ruleType_code: ruleType,
+              value: value,
+              severityRating: severity,
+            };
+            await cds.run(INSERT.into(BaseRules).entries(rulePayload));
+            existingRule = await cds.run(
+              SELECT.one.from(BaseRules).where({
+                objectType: objectType,
+                ruleType_code: ruleType,
+                value: value,
+              })
+            );
+            console.log("cp3");
+          }
         }
 
         // Prepare the final payload for the AutomationLog
@@ -154,10 +173,12 @@ module.exports = (srv) => {
           severity: severity,
           objectName: objectName,
         };
+        console.log("cp4");
+        console.log(payload);
 
         // Insert the log
         await cds.run(INSERT.into(AutomationLogs).entries(payload));
-
+        console.log("cp5");
         successfulCount++; // Increment count on success
       } catch (err) {
         // Catch any errors (validation or DB errors) for this specific log

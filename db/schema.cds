@@ -13,9 +13,9 @@ using {
 entity ObjectType {
     key code        : String(5);
         description : String(75);
-     programId :  String(5);
+        programId   : String(5);
         active      : Boolean;
-        manual: Boolean;
+        manual      : Boolean;
 
 }
 
@@ -75,8 +75,8 @@ entity AutomationLog : cuid {
 
     user             : Association to one CodeUser;
     transportRequest : String(20);
-    subRequest: String (20);
-    checkDate        : Date;
+    subRequest       : String(20);
+    checkDate        : DateTime;
     baseRule         : Association to one BaseRule;
     objectName       : String(200);
     severity         : Int16;

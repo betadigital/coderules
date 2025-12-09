@@ -20,12 +20,12 @@ service RuleService @(path: '/codeRuleService') {
         user             : String;
         transportRequest : String;
         subRequest       : String;
-        checkdate        : Date;
+        checkDate        : DateTime;
         objectType       : String;
-        ruletype         : String;
+        ruleType         : String;
         value            : String;
         result           : String;
-        objectname       : String;
+        objectName       : String;
         severity         : Int16;
 
     }
@@ -179,7 +179,7 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
-    action   addLog(logs: array of Log)                       returns String;
+    action   addLogs(logs: array of Log)                      returns String;
 
     function getApplicableRules(userId: String)               returns array of SimpleRule;
 
