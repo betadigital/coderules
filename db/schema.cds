@@ -45,8 +45,8 @@ entity RuleType {
 }
 
 @assert.unique: {userRuleTemplate: [
-    baseRule_ID,
-    user_ID,
+    baseRule,
+    user,
 
 ]}
 entity UserRule : managed {

@@ -182,6 +182,8 @@ service RuleService @(path: '/codeRuleService') {
 
         };
 
+    action   initNewUserRules(userId: String)                 returns String;
+
     action   addLogs(logs: array of Log)                      returns String;
 
     function getApplicableRules(userId: String)               returns array of SimpleRule;
