@@ -26,6 +26,93 @@ module.exports = (srv) => {
     }
   });
 
+  srv.before("NEW", "UserRules", async (req) => {
+    // use en-CA because it outputs YYYY-MM-DD format automatically
+    req.data.effectiveDate = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Australia/Sydney",
+    });
+
+    // Set End Date to Infinity
+    req.data.endDate = "9999-12-31";
+  });
+
+  srv.before("CREATE", "UserRules", async (req) => {
+    //
+    // use en-CA because it outputs YYYY-MM-DD format automatically
+    req.data.effectiveDate = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Australia/Sydney",
+    });
+
+    // Set End Date to Infinity
+    req.data.endDate = "9999-12-31";
+  });
+
+  srv.on("CREATE", "UserRules", async (req, next) => {
+    console.log("LOGGING OUR REQUEST DATA", req.data);
+    return next();
+  });
+
+  srv.on("UPDATE", "CodeUsers", async (req, next) => {
+    console.log("LOGGING OUR REQUEST DATA", req.data);
+    return next();
+  });
+
+  srv.on("applyAllRules", "CodeUsers", async (req) => {
+    // Get the User ID from the bound target
+    const userID = req.params[0].ID;
+
+    // Define Dates
+    const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+    const maxDate = "9999-12-31";
+
+    const tx = cds.tx(req);
+
+    // Fetch ALL BaseRules (The templates)
+    const allBaseRules = await tx.run(SELECT.from(BaseRules));
+    if (!allBaseRules || allBaseRules.length === 0) {
+      return "No Base Rules found in the system.";
+    }
+
+    // Fetch EXISTING UserRules for this user (The exclusions)
+    const existingUserRules = await tx.run(
+      SELECT.from(UserRules).columns("baseRule_ID").where({ user_ID: userID })
+    );
+
+    // Create a Set of existing IDs for fast lookup
+    const existingRuleIDs = new Set(
+      existingUserRules.map((r) => r.baseRule_ID)
+    );
+
+    // Filter: Find BaseRules that are NOT in the existing set
+    const rulesToCreate = allBaseRules
+      .filter((baseRule) => !existingRuleIDs.has(baseRule.ID))
+      .map((baseRule) => ({
+        baseRule_ID: baseRule.ID,
+        user_ID: userID,
+        effectiveDate: today,
+        endDate: maxDate,
+      }));
+
+    //  Bulk Insert (Skip if nothing to add)
+    if (rulesToCreate.length > 0) {
+      await tx.run(INSERT.into(UserRules).entries(rulesToCreate));
+
+      // Optional: Notify the UI to refresh
+      req.notify({
+        message: `Successfully applied ${rulesToCreate.length} new rules.`,
+        type: "success",
+      });
+
+      return `${rulesToCreate.length} rules applied.`;
+    } else {
+      req.notify({
+        message: "User already has all applicable rules.",
+        type: "info",
+      });
+      return "No new rules to apply.";
+    }
+  });
+
   /**
    * Helper to handle trust updates and force UI refresh
    */

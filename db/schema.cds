@@ -44,14 +44,16 @@ entity RuleType {
         description : String(100)
 }
 
+@assert.unique: {userRuleTemplate: [
+    baseRule_ID,
+    user_ID,
+
+]}
 entity UserRule : managed {
     key ID            : UUID;
         baseRule      : Association to one BaseRule;
 
-        @mandatory
         effectiveDate : Date;
-
-        @mandatory
         endDate       : Date;
         user          : Association to one CodeUser;
 }

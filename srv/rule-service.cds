@@ -115,14 +115,16 @@ service RuleService @(path: '/codeRuleService') {
                 'in/trusted',
                 'in/untrusted'
             ]}
-            action makeTrusted()   returns CodeUsers;
+            action   makeTrusted()   returns CodeUsers;
 
             @Core.OperationAvailable: IsActiveEntity
             @Common.SideEffects     : {TargetProperties: [
                 'in/trusted',
                 'in/untrusted'
             ]}
-            action makeUntrusted() returns CodeUsers;
+            action   makeUntrusted() returns CodeUsers;
+
+            function applyAllRules() returns String;
         };
 
     @Capabilities.InsertRestrictions.Insertable: false
@@ -139,6 +141,7 @@ service RuleService @(path: '/codeRuleService') {
 
             effectiveDate,
             endDate,
+
 
             @(Common.ValueList: {
                 CollectionPath: 'BaseRules',

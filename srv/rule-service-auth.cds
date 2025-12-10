@@ -28,6 +28,13 @@ annotate RuleService.CodeUsers with @(restrict: [
         grant: '*',
         to   : 'RuleAdmin'
     },
+    {
+        grant: 'applyAllRules',
+        to   : [
+            'RuleM2M',
+            'RuleAdmin'
+        ]
+    },
 
     {
         grant: 'READ',
@@ -48,6 +55,7 @@ annotate RuleService.UserRules with @(restrict: [
         grant: 'WRITE',
         to   : ['RuleCreator']
     },
+
 
     {
         grant: 'READ',
