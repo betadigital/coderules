@@ -1,5 +1,6 @@
-code,description
-LINE_COUNT,Max line count
-LINE_WIDTH,Max line width 
-COMMAND,Disallowed command type
+code,description,valueType
+LINE_COUNT,Max line count,integer
+LINE_WIDTH,Max line width,integer
+COMMAND,Disallowed command type,string
+METHOD_CHAINING,Method/Object chaining depth,integer
 

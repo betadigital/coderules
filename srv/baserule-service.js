@@ -2,21 +2,21 @@ const cds = require("@sap/cds");
 const { SELECT, INSERT } = require("@sap/cds/lib/ql/cds-ql");
 
 module.exports = (srv) => {
-  const { BaseRules } = srv.entities;
+  const { BaseRules, RuleTypes } = srv.entities;
 
   srv.before("*", async (req) => {
     // This logs the event (e.g., CREATE, READ, uploadBaseRules) and the target entity
     console.log(
       `[AUTH_CHECK] Incoming request for event: ${req.event}, target: ${
         req.target ? req.target.name : "unknown"
-      }`
+      }`,
     );
     if (req.user) {
       console.log(
         "User credentials detected on HTTP request. See below:\nID: ",
         req.user.id,
         "\nRoles: ",
-        req.user.roles
+        req.user.roles,
       );
     } else {
       console.log("Unauthenticated request received...");
@@ -24,29 +24,84 @@ module.exports = (srv) => {
   });
 
   // --- Your Event Handlers ---
+  async function validateRuleData(data) {
+    console.log("validating rule data: ", data);
+    const { ruleType_code, value } = data;
 
-  // REFACTORED 'CREATE' handler
+    if (!ruleType_code || value == null) {
+      return { code: 400, message: "ruleType_code and value are required." };
+    }
+
+    // Fetch the RuleType to get its valueType
+    const ruleType = await SELECT.one.from(RuleTypes).where({ code: ruleType_code });
+
+    if (!ruleType) {
+      return { code: 400, message: `Unknown ruleType '${ruleType_code}'` };
+    }
+
+    const { valueType } = ruleType;
+
+    switch (valueType) {
+      case "integer":
+        console.log("seeing an integer, with value = ", value);
+        if (!Number.isInteger(Number(value))) {
+          return {
+            code: 400,
+            message: `Value '${value}' must be an integer for ruleType '${ruleType_code}'.`,
+          };
+        }
+        break;
+
+      case "float":
+        if (isNaN(Number(value))) {
+          return {
+            code: 400,
+            message: `Value '${value}' must be numeric for ruleType '${ruleType_code}'.`,
+          };
+        }
+        break;
+
+      case "boolean":
+        if (!["true", "false", "1", "0"].includes(String(value).toLowerCase())) {
+          return {
+            code: 400,
+            message: `Value '${value}' must be boolean for ruleType '${ruleType_code}'.`,
+          };
+        }
+        break;
+
+      case "string":
+        // always valid
+        break;
+
+      default:
+        return {
+          code: 400,
+          message: `Unsupported valueType '${valueType}' for ruleType '${ruleType_code}'.`,
+        };
+    }
+
+    // no errors
+    return null;
+  }
+
+  // --- CREATE handler ---
   srv.before("CREATE", "BaseRules", async (req) => {
     const { objectType_code: objectType, ruleType_code, value } = req.data;
 
-    // A. Validate required fields
+    // Validate required fields
     if (!objectType || !ruleType_code || value == null) {
-      console.log(
-        `Object type: ${objectType}, ruleType: ${ruleType_code}, value: ${value}`
-      );
       return req.error(
         400,
-        "objectType, ruleType_code, and value are required fields."
+        "objectType, ruleType_code, and value are required fields.",
       );
     }
 
-    // B. Run the rule-specific logic validation
-    const logicError = validateRuleData(req.data);
-    if (logicError) {
-      return req.error(logicError.code, logicError.message);
-    }
+    // Run valueType validation
+    const logicError = await validateRuleData(req.data);
+    if (logicError) return req.error(logicError.code, logicError.message);
 
-    // C. Check uniqueness
+    // Check uniqueness
     const duplicate = await SELECT.one.from(BaseRules).where({
       objectType,
       ruleType_code,
@@ -56,60 +111,53 @@ module.exports = (srv) => {
     if (duplicate) {
       return req.error(
         409,
-        `A rule already exists with the same objectType (${objectType}), ruleType (${ruleType_code}) and value (${value}). Existing ID: ${duplicate.ID}`
+        `A rule already exists with objectType (${objectType}), ruleType (${ruleType_code}) and value (${value}). Existing ID: ${duplicate.ID}`,
       );
     }
 
-    // Otherwise allow create
+    // Otherwise allow creation
   });
 
+  // --- UPDATE handler ---
   srv.before("UPDATE", "BaseRules", async (req) => {
-    // 1. Get the key object of the record being updated, e.g., { ID: '...' }
-    const key = req.params[0]; // Renamed from ruleId for clarity
-    //
-    try {
-      const existingData = await SELECT.one.from(BaseRules).where(key);
+    const key = req.params[0];
 
-      if (!existingData) {
-        // Use key.ID to get the actual UUID string for the error message
-        return req.error(404, `Rule with ID ${key.ID} not found.`);
-      }
+    // Fetch existing data
+    const existingData = await SELECT.one.from(BaseRules).where(key);
 
-      // 3. Create the 'final state' by merging existing data with incoming data.
-      const mergedData = { ...existingData, ...req.data };
-
-      // 4. Run the rule-specific logic validation on the *merged* data.
-      const logicError = validateRuleData(mergedData); // (This calls your helper function)
-      if (logicError) {
-        return req.error(logicError.code, logicError.message);
-      }
-
-      // 5. Check uniqueness (only if a relevant field is being changed)
-      const { objectType_code: objectType, ruleType_code, value } = req.data;
-      if (objectType || ruleType_code || value != null) {
-        const duplicate = await SELECT.one.from(BaseRules).where({
-          objectType: mergedData.objectType,
-          ruleType_code: mergedData.ruleType_code,
-          value: mergedData.value,
-          ID: { "!=": key.ID },
-        });
-
-        if (duplicate) {
-          return req.error(
-            409,
-            `An update would cause a conflict. A rule already exists with objectType (${mergedData.objectType}), ruleType (${mergedData.ruleType_code}) and value (${mergedData.value}). Existing ID: ${duplicate.ID}`
-          );
-        }
-      }
-
-      // Otherwise allow update
-    } catch (err) {
-      console.error(err);
+    if (!existingData) {
+      return req.error(404, `Rule with ID ${key.ID} not found.`);
     }
+
+    // Merge existing + incoming data
+    const mergedData = { ...existingData, ...req.data };
+
+    // Run valueType validation
+    const logicError = await validateRuleData(mergedData);
+    if (logicError) return req.error(logicError.code, logicError.message);
+
+    // Check uniqueness only if relevant fields are being changed
+    const { objectType_code: objectType, ruleType_code, value } = req.data;
+    if (objectType || ruleType_code || value != null) {
+      const duplicate = await SELECT.one.from(BaseRules).where({
+        objectType: mergedData.objectType,
+        ruleType_code: mergedData.ruleType_code,
+        value: mergedData.value,
+        ID: { "!=": key.ID },
+      });
+
+      if (duplicate) {
+        return req.error(
+          409,
+          `An update would cause a conflict. A rule already exists with objectType (${mergedData.objectType}), ruleType (${mergedData.ruleType_code}) and value (${mergedData.value}). Existing ID: ${duplicate.ID}`,
+        );
+      }
+    }
+
+    // Otherwise allow update
   });
 
   srv.on("fileUploadBaseRules", async (req) => {
-    console.log("CP1");
     const { rules: rulesJsonString } = req.data;
     if (!rulesJsonString) return req.error(400, "No rules payload found.");
 
@@ -120,14 +168,12 @@ module.exports = (srv) => {
       return req.error(400, `Invalid JSON payload: ${e.message}`);
     }
 
-    console.log("CP2");
     if (!Array.isArray(rules) || rules.length === 0)
       return req.error(400, "Payload must be a non-empty array of rules.");
 
     const tx = cds.tx(req);
 
     try {
-      console.log("CP3");
       //Normalize input and remove empty rows
       rules = rules
         .map((r) => ({
@@ -158,7 +204,7 @@ module.exports = (srv) => {
             objectType: rules[i].objectType,
             ruleType: rules[i].ruleType,
             value: rules[i].value,
-          })
+          }),
         );
         if (entry) {
           existing.push(entry);
@@ -173,7 +219,7 @@ module.exports = (srv) => {
           .join(", ");
         return req.error(
           409,
-          `The following rules already exist in the system: ${duplicates}`
+          `The following rules already exist in the system: ${duplicates}`,
         );
       }
       console.log("CP5");

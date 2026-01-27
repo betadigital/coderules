@@ -104,15 +104,6 @@
             "CodeUsersList",
             "CodeUsersObjectPage"
           ]
-        },
-        {
-          "pattern": "CodeUsers({key})/rules({key2}):?query:",
-          "name": "UserRulesObjectPage",
-          "target": [
-            "CodeUsersList",
-            "CodeUsersObjectPage",
-            "UserRulesObjectPage"
-          ]
         }
       ],
       "targets": {
@@ -151,30 +142,11 @@
             "settings": {
               "editableHeaderContent": false,
               "contextPath": "/CodeUsers",
-              "navigation": {
-                "rules": {
-                  "detail": {
-                    "route": "UserRulesObjectPage"
-                  }
-                }
-              }
+              "navigation": {}
             }
           },
           "controlAggregation": "midColumnPages",
           "contextPattern": "/CodeUsers({key})"
-        },
-        "UserRulesObjectPage": {
-          "type": "Component",
-          "id": "UserRulesObjectPage",
-          "name": "sap.fe.templates.ObjectPage",
-          "options": {
-            "settings": {
-              "editableHeaderContent": false,
-              "contextPath": "/CodeUsers/rules"
-            }
-          },
-          "controlAggregation": "endColumnPages",
-          "contextPattern": "/CodeUsers({key})/rules({key2})"
         }
       }
     },

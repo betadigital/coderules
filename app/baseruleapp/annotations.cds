@@ -40,6 +40,11 @@ annotate service.BaseRules with @(
             Value : severityRating,
             Label : 'Severity ',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : codeQualityRule,
+            Label : 'Code Quality Rule?',
+        },
     ],
     UI.Facets : [
         {
@@ -76,6 +81,11 @@ annotate service.BaseRules with @(
                 $Type : 'UI.DataField',
                 Value : severityRating,
                 Label : 'Severity Rating',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : codeQualityRule,
+                Label : 'Code Quality Rule?',
             },
         ],
     },

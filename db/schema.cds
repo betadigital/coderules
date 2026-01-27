@@ -2,13 +2,12 @@ namespace codeRules;
 
 using {
     cuid,
-    managed,
+    managed
 } from '@sap/cds/common';
-
 
 @assert.unique: {objectTypeTemplate: [
     code,
-    programId,
+    programId
 ]}
 entity ObjectType {
     key code        : String(5);
@@ -16,9 +15,7 @@ entity ObjectType {
         programId   : String(5);
         active      : Boolean;
         manual      : Boolean;
-
 }
-
 
 @assert.unique: {ruleTemplate: [
     objectType,
@@ -37,34 +34,26 @@ entity BaseRule : cuid, managed {
 
     @mandatory
     severityRating : Int16;
+
+    codeQualityRule: Boolean default true;
 }
 
 entity RuleType {
     key code        : String(30);
-        description : String(100)
-}
-
-@assert.unique: {userRuleTemplate: [
-    baseRule,
-    user,
-
-]}
-entity UserRule : managed {
-    key ID            : UUID;
-        baseRule      : Association to one BaseRule;
-
-        effectiveDate : Date;
-        endDate       : Date;
-        user          : Association to one CodeUser;
+        description : String(100);
+        valueType   : String enum {
+            string;
+            integer;
+            float;
+            boolean;
+        } default 'integer'
 }
 
 entity CodeUser : managed {
     key ID      : String(36);
-        rules   : Composition of many UserRule
-                      on rules.user = $self;
 
-        @mandatory
-        trusted : Boolean default false;
+    @mandatory
+    trusted : Boolean default false;
 }
 
 @assert.unique: {AutomationLogEntry: [
@@ -74,7 +63,6 @@ entity CodeUser : managed {
     baseRule
 ]}
 entity AutomationLog : cuid {
-
     user             : Association to one CodeUser;
     transportRequest : String(20);
     subRequest       : String(20);
