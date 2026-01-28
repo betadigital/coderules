@@ -7,7 +7,8 @@ service BaseRuleService @(path: '/baseRuleService') {
         projection on codeRules.RuleType {
             code,
             @readonly
-            description
+            description,
+            valueType
         };
 
 

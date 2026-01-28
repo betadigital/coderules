@@ -35,15 +35,17 @@ module.exports = (srv) => {
     // Fetch the RuleType to get its valueType
     const ruleType = await SELECT.one.from(RuleTypes).where({ code: ruleType_code });
 
+    console.log("rule type is: ", ruleType);
     if (!ruleType) {
       return { code: 400, message: `Unknown ruleType '${ruleType_code}'` };
     }
 
     const { valueType } = ruleType;
 
+    console.log("value type is: ", valueType);
     switch (valueType) {
       case "integer":
-        console.log("seeing an integer, with value = ", value);
+        console.log("integer value type, with value = ", value);
         if (!Number.isInteger(Number(value))) {
           return {
             code: 400,
@@ -53,6 +55,7 @@ module.exports = (srv) => {
         break;
 
       case "float":
+        console.log("float value type, with value = ", value);
         if (isNaN(Number(value))) {
           return {
             code: 400,
@@ -62,6 +65,7 @@ module.exports = (srv) => {
         break;
 
       case "boolean":
+        console.log("boolean value type, with value = ", value);
         if (!["true", "false", "1", "0"].includes(String(value).toLowerCase())) {
           return {
             code: 400,
@@ -72,6 +76,13 @@ module.exports = (srv) => {
 
       case "string":
         // always valid
+        console.log("string value type, with value = ", value);
+        if (Number.isInteger(Number(value))) {
+          return {
+            code: 400,
+            message: `Value '${value}' must not be integer for ruleType '${ruleType_code}'.`,
+          };
+        }
         break;
 
       default:
@@ -85,8 +96,8 @@ module.exports = (srv) => {
     return null;
   }
 
-  // --- CREATE handler ---
-  srv.before("CREATE", "BaseRules", async (req) => {
+  // --- CREATE handler---
+  srv.before("CREATE", BaseRules, async (req) => {
     const { objectType_code: objectType, ruleType_code, value } = req.data;
 
     // Validate required fields
@@ -98,6 +109,7 @@ module.exports = (srv) => {
     }
 
     // Run valueType validation
+    console.log("running validation checks");
     const logicError = await validateRuleData(req.data);
     if (logicError) return req.error(logicError.code, logicError.message);
 
@@ -120,19 +132,17 @@ module.exports = (srv) => {
 
   // --- UPDATE handler ---
   srv.before("UPDATE", "BaseRules", async (req) => {
-    const key = req.params[0];
+    const keyID = req.params[0].ID || req.params[0];
 
-    // Fetch existing data
-    const existingData = await SELECT.one.from(BaseRules).where(key);
+    // Fetch existing data using the ID specifically
+    const existingData = await SELECT.one.from(BaseRules).where({ ID: keyID });
 
-    if (!existingData) {
-      return req.error(404, `Rule with ID ${key.ID} not found.`);
-    }
+    if (!existingData) return req.error(404, `Rule not found.`);
 
-    // Merge existing + incoming data
     const mergedData = { ...existingData, ...req.data };
 
     // Run valueType validation
+    console.log("running validation checks");
     const logicError = await validateRuleData(mergedData);
     if (logicError) return req.error(logicError.code, logicError.message);
 
@@ -140,21 +150,16 @@ module.exports = (srv) => {
     const { objectType_code: objectType, ruleType_code, value } = req.data;
     if (objectType || ruleType_code || value != null) {
       const duplicate = await SELECT.one.from(BaseRules).where({
-        objectType: mergedData.objectType,
+        objectType_code: mergedData.objectType_code, // Use the _code suffix
         ruleType_code: mergedData.ruleType_code,
         value: mergedData.value,
-        ID: { "!=": key.ID },
+        ID: { "!=": keyID },
       });
 
       if (duplicate) {
-        return req.error(
-          409,
-          `An update would cause a conflict. A rule already exists with objectType (${mergedData.objectType}), ruleType (${mergedData.ruleType_code}) and value (${mergedData.value}). Existing ID: ${duplicate.ID}`,
-        );
+        return req.error(409, `An update would cause a conflict...`);
       }
     }
-
-    // Otherwise allow update
   });
 
   srv.on("fileUploadBaseRules", async (req) => {
@@ -232,48 +237,4 @@ module.exports = (srv) => {
       return req.error(500, `Failed to upload rules: ${err.message}`);
     }
   });
-
-  // --- Helper Function ---
-  // This function validates the 'final state' of a rule.
-  function validateRuleData(data) {
-    const { ruleType_code, value } = data;
-
-    // Check for null/undefined. An empty string is a valid 'value'.
-    if (value == null) {
-      // This check is mainly for 'CREATE'.
-      // In 'UPDATE', 'mergedData' will always have a value.
-      return { code: 400, message: 'The "value" field cannot be null.' };
-    }
-
-    switch (ruleType_code) {
-      case "COMMAND":
-        // Must be alphabetical. We use a regex to check.
-        const alphaRegex = /^[a-zA-Z]+$/;
-        if (!alphaRegex.test(value)) {
-          return {
-            code: 400,
-            message: `Rule type 'COMMAND' requires a purely alphabetical value. Received: '${value}'`,
-          };
-        }
-        break;
-
-      case "LINE_WIDTH":
-      case "LINE_COUNT":
-        // Must be numeric and greater than 0
-        const numValue = Number(value);
-        if (isNaN(numValue) || numValue <= 0) {
-          return {
-            code: 400,
-            message: `Rule type '${ruleType_code}' requires a numeric value greater than 0. Received: '${value}'`,
-          };
-        }
-        break;
-
-      default:
-        // No specific validation for other types
-        break;
-    }
-
-    return null; // No errors
-  }
 };
