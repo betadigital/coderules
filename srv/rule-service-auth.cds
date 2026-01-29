@@ -35,6 +35,12 @@ annotate RuleService.CodeUsers with @(restrict: [
             'RuleAdmin'
         ]
     },
+    {
+        grant: 'CREATE',
+        to   : [
+            'RuleM2M'
+        ]
+    },
 
     {
         grant: 'READ',

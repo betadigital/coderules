@@ -71,6 +71,7 @@ service RuleService @(path: '/codeRuleService') {
     };
 
     @odata.draft.enabled
+    @odata.draft.bypass
     @Common.Label: 'Code User'
     entity CodeUsers as projection on codeRules.CodeUser {
         @(
