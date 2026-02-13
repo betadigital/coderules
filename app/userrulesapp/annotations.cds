@@ -20,6 +20,11 @@ annotate service.CodeUsers with @(
             $Type: 'UI.DataField',
             Value: createdAt,
         },
+        {
+            $Type : 'UI.DataField',
+            Value : isActive,
+            Label : '{i18n>IsActive}',
+        },
     ],
     UI.HeaderFacets          : [{
         $Type : 'UI.ReferenceFacet',
@@ -52,6 +57,11 @@ annotate service.CodeUsers with @(
                 $Type : 'UI.DataField',
                 Value : trusted,
                 Label : 'Is Trusted?',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : isActive,
+                Label : '{i18n>Isactive}',
             },
         ],
     },

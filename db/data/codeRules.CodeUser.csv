@@ -1,5 +1,5 @@
-ID;trusted;createdAt;createdBy;modifiedAt;modifiedBy
-USER-01;false;2025-01-01T00:00:00Z;system;2025-01-01T00:00:00Z;system
-USER-02;false;2025-01-01T00:00:00Z;system;2025-01-01T00:00:00Z;system
-USER-03;true;2025-01-01T00:00:00Z;system;2025-01-01T00:00:00Z;system
-USER-04;true;2025-01-01T10:10:00Z;fake-user@gmail.com;2025-09-08T01:10:00Z;system
+ID;trusted;createdAt;createdBy;modifiedAt;modifiedBy;isActive
+USER-01;false;2025-01-01T00:00:00Z;system;2025-01-01T00:00:00Z;system;true
+USER-02;false;2025-01-01T00:00:00Z;system;2025-01-01T00:00:00Z;system;true
+USER-03;true;2025-01-01T00:00:00Z;system;2025-01-01T00:00:00Z;system;true
+USER-04;true;2025-01-01T10:10:00Z;fake-user@gmail.com;2025-09-08T01:10:00Z;system;false

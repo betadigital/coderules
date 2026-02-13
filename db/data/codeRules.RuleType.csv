@@ -3,4 +3,14 @@ LINE_COUNT,Max line count,integer
 LINE_WIDTH,Max line width,integer
 COMMAND,Disallowed command type,string
 METHOD_CHAINING,Method/Object chaining depth,integer
+NEGATED_CONDITION,Check negated conditions,none
+EMPTY_IF,No empty IF branches,none
+METHOD_OPTIONAL_PARAM,Split methods instead of adding OPTIONAL parameters,none
+METHOD_IMP_PARAM,Number of IMPORTING parameters in methods,integer
+METHOD_EXP_PARAM,Number of EXPORTING parameters in methods,integer
+METH_SINGLE_EXPORT,Prefer RETURNING to EXPORTING in methods,none
+DEFAULT_KEY,Avoid DEFAULT KEY,none
+BOOLEAN_IMPORT,Split method instead of Boolean input parameter,none
+METHOD_LENGTH,Code lines inside method,integer
+DYNAMIC_CODE,Check dynamic code,none
 

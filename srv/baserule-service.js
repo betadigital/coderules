@@ -85,6 +85,10 @@ module.exports = (srv) => {
         }
         break;
 
+      case "none":
+        console.log("none value type, with value = ", value);
+        break;
+
       default:
         return {
           code: 400,

@@ -68,7 +68,8 @@ service BaseRuleService @(path: '/baseRuleService') {
             )
             ruleType,
             severityRating,
-            codeQualityRule
+            codeQualityRule,
+            isActive
         };
 
     action fileUploadBaseRules(rules: LargeString) returns String;

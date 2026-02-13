@@ -83,6 +83,7 @@ service RuleService @(path: '/codeRuleService') {
         createdAt,
         modifiedBy,
         trusted,
+        isActive,
 
         @Common.Label: 'Untrusted Status'
         cast(

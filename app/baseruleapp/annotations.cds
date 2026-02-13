@@ -45,6 +45,11 @@ annotate service.BaseRules with @(
             Value : codeQualityRule,
             Label : 'Code Quality Rule?',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : isActive,
+            Label : '{i18n>IsActive}',
+        },
     ],
     UI.Facets : [
         {
@@ -86,6 +91,11 @@ annotate service.BaseRules with @(
                 $Type : 'UI.DataField',
                 Value : codeQualityRule,
                 Label : 'Code Quality Rule?',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : isActive,
+                Label : '{i18n>IsActive}',
             },
         ],
     },

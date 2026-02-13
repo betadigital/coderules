@@ -29,13 +29,14 @@ entity BaseRule : cuid, managed {
     @mandatory
     ruleType       : Association to one RuleType;
 
-    @mandatory
     value          : String(50);
 
     @mandatory
     severityRating : Int16;
 
     codeQualityRule: Boolean default true;
+
+    isActive       : Boolean default true;
 }
 
 entity RuleType {
@@ -46,6 +47,7 @@ entity RuleType {
             integer;
             float;
             boolean;
+            none;
         } default 'integer'
 }
 
@@ -54,6 +56,7 @@ entity CodeUser : managed {
 
     @mandatory
     trusted : Boolean default false;
+    isActive: Boolean default true;
 }
 
 @assert.unique: {AutomationLogEntry: [
