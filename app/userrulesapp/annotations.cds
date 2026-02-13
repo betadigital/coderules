@@ -58,18 +58,20 @@ annotate service.CodeUsers with @(
                 Value : trusted,
                 Label : 'Is Trusted?',
             },
-            {
-                $Type : 'UI.DataField',
-                Value : isActive,
-                Label : '{i18n>Isactive}',
-            },
         ],
     },
     UI.FieldGroup #AdminInfo1: {
         $Type: 'UI.FieldGroupType',
         Data : [],
     },
-    UI.Facets                : [ ],
+    UI.Facets                : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            Label : '{i18n>UserInformation}',
+            ID : 'Info',
+            Target : '@UI.FieldGroup#Info',
+        },
+    ],
     UI.HeaderInfo            : {
         TypeName      : 'Code User',
         TypeNamePlural: 'Code Users',
@@ -103,6 +105,20 @@ annotate service.CodeUsers with @(
                 $Type : 'UI.DataField',
                 Value : trusted,
                 Label : 'trusted',
+            },
+        ],
+    },
+    UI.FieldGroup #Info : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : ID,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : isActive,
+                Label : 'Is Active?',
             },
         ],
     },
