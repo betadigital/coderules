@@ -24,19 +24,19 @@ entity ObjectType {
 ]}
 entity BaseRule : cuid, managed {
     @mandatory
-    objectType     : Association to one ObjectType;
+    objectType      : Association to one ObjectType;
 
     @mandatory
-    ruleType       : Association to one RuleType;
+    ruleType        : Association to one RuleType;
 
-    value          : String(50);
+    value           : String(50);
 
     @mandatory
-    severityRating : Int16;
+    severityRating  : Int16;
 
-    codeQualityRule: Boolean default true;
+    codeQualityRule : Boolean default true;
 
-    isActive       : Boolean default true;
+    isActive        : Boolean default true;
 }
 
 entity RuleType {
@@ -52,11 +52,11 @@ entity RuleType {
 }
 
 entity CodeUser : managed {
-    key ID      : String(36);
+    key ID       : String(36);
 
-    @mandatory
-    trusted : Boolean default false;
-    isActive: Boolean default true;
+        @mandatory
+        trusted  : Boolean default false;
+        isActive : Boolean default true;
 }
 
 @assert.unique: {AutomationLogEntry: [
@@ -74,4 +74,12 @@ entity AutomationLog : cuid {
     objectName       : String(200);
     severity         : Int16;
     result           : String(10);
+    codeQualityRule  : Boolean;
+}
+
+entity TransportOutcome : cuid, managed {
+    transportRequest : String(20);
+    user             : Association to one CodeUser;
+    failedChecks     : Boolean;
+
 }

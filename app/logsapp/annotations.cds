@@ -113,6 +113,11 @@ annotate service.AutomationLogs with @(
                 Value : baseRule.objectType_code,
                 Label : 'Object Type',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : codeQualityRule,
+                Label : 'Is Code Quality rule?',
+            },
         ],
     },
     UI.HeaderInfo : {

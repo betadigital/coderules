@@ -40,9 +40,13 @@ module.exports = (srv) => {
     const actionVerb = isTrusted ? "trusted" : "untrusted";
 
     try {
-      await cds.run(UPDATE(CodeUsers).set({ trusted: isTrusted }).where({ ID }));
+      await cds.run(
+        UPDATE(CodeUsers).set({ trusted: isTrusted }).where({ ID }),
+      );
 
-      const updatedUser = await cds.run(SELECT.one.from(CodeUsers).where({ ID }));
+      const updatedUser = await cds.run(
+        SELECT.one.from(CodeUsers).where({ ID }),
+      );
 
       return {
         ...updatedUser,
@@ -89,6 +93,7 @@ module.exports = (srv) => {
           result,
           severity,
           objectName,
+          codeQualityRule,
         } = log;
 
         // Basic validation
@@ -102,7 +107,8 @@ module.exports = (srv) => {
           !value ||
           !result ||
           !severity ||
-          !objectName
+          !objectName ||
+          !codeQualityRule
         ) {
           throw new Error("Missing required field(s)");
         }
@@ -143,6 +149,7 @@ module.exports = (srv) => {
           result: cleanResult.toUpperCase(),
           severity,
           objectName,
+          codeQualityRule: codeQualityRule,
           baseRule: existingRule,
         };
 
@@ -158,6 +165,53 @@ module.exports = (srv) => {
       `${successful} of ${logs.length} logs added successfully.` +
       (failed.length ? ` Failed indices: [${failed.join(", ")}]` : "")
     );
+  });
+
+  srv.on("addTransportOutcomes", async (req) => {
+    console.log("addTransportOutcomes called");
+
+    const { transportOutcomes } = req.data;
+    if (!Array.isArray(transportOutcomes) || transportOutcomes.length === 0) {
+      return req.error(400, "Outcomes must be a non-empty array");
+    }
+
+    let successful = 0;
+    const failed = [];
+
+    for (let i = 0; i < transportOutcomes.length; i++) {
+      const entry = transportOutcomes[i];
+
+      try {
+        const { user, transportRequest, failedChecks } = entry;
+
+        // Basic validation for required fields
+        if (!user || !transportRequest || failedChecks === undefined) {
+          throw new Error(
+            "Missing required fields: user, transportRequest, or failedChecks",
+          );
+        }
+
+        // Construct payload for the TransportOutcome entity
+        const payload = {
+          user_ID: user, // Assuming CodeUser ID is the link
+          transportRequest: transportRequest,
+          failedChecks: failedChecks,
+        };
+
+        // Insert into the TransportOutcomes projection/entity
+        await cds.run(INSERT.into("TransportOutcomes").entries(payload));
+
+        successful++;
+      } catch (err) {
+        console.error(`Failed to process transportOutcome[${i}]:`, err.message);
+        failed.push(i);
+      }
+    }
+
+    const response = `${successful} of ${transportOutcomes.length} outcomes added successfully.`;
+    return failed.length
+      ? `${response} Failed indices: [${failed.join(", ")}]`
+      : response;
   });
 
   /**
