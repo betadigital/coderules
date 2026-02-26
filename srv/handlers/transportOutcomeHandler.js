@@ -1,4 +1,5 @@
 const cds = require("@sap/cds");
+const { TransportOutcome } = cds.entities("codeRules");
 
 class TransportOutcomeHandler {
   /**
@@ -19,7 +20,7 @@ class TransportOutcomeHandler {
     for (let i = 0; i < transportOutcomes.length; i++) {
       const entry = transportOutcomes[i];
       try {
-        const { user, transportRequest, failedChecks } = entry;
+        const { user_ID: user, transportRequest, failedChecks } = entry;
 
         if (!user || !transportRequest || failedChecks === undefined) {
           throw new Error(
@@ -33,7 +34,7 @@ class TransportOutcomeHandler {
           failedChecks: failedChecks,
         };
 
-        await cds.run(INSERT.into("TransportOutcomes").entries(payload));
+        await cds.run(INSERT.into(TransportOutcome).entries(payload));
         successful++;
       } catch (err) {
         console.error(`Failed to process transportOutcome[${i}]:`, err.message);
