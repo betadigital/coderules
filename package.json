@@ -27,7 +27,8 @@
     "devRouter": "cds bind --exec -- npm run start:router",
     "devStart": "npm run devBuild && npm run devRouter",
     "watch-logsapp": "cds watch --open logsapp/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "watch-objecttypes": "cds watch --open objecttypes/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-objecttypes": "cds watch --open objecttypes/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-transportoutcomesapp": "cds watch --open transportoutcomesapp/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
   "cds": {
@@ -67,6 +68,7 @@
     "app/baseruleapp",
     "app/userrulesapp",
     "app/logsapp",
-    "app/objecttypes"
+    "app/objecttypes",
+    "app/transportoutcomesapp"
   ]
 }

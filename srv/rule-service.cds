@@ -33,7 +33,16 @@ service RuleService @(path: '/codeRuleService') {
         failedChecks     : Boolean;
     }
 
-    entity TransportOutcomes as projection on codeRules.TransportOutcome;
+    entity TransportOutcomes as projection on codeRules.TransportOutcome {
+        *,
+        case 
+            failedChecks
+            when false
+                then 'PASSED'
+            else
+                'FAILED'
+            end as statusText : String
+    };
 
 
     @Capabilities.InsertRestrictions.Insertable: false
