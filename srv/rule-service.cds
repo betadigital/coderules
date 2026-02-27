@@ -25,6 +25,7 @@ service RuleService @(path: '/codeRuleService') {
         objectName       : String;
         severity         : Int16;
         codeQualityRule  : Boolean;
+        message: String;
     }
 
     type Outcome {

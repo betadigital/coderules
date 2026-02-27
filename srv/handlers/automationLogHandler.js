@@ -1,4 +1,5 @@
 const cds = require("@sap/cds");
+const { message } = require("@sap/cds/lib/log/cds-error");
 const { BaseRule, AutomationLog } = cds.entities;
 
 class AutomationLogHandler {
@@ -31,21 +32,19 @@ class AutomationLogHandler {
           result,
           severity,
           objectName,
+          message,
           codeQualityRule,
         } = log;
 
         if (
           !user ||
+          !ruleType ||
           !transportRequest ||
-          !subRequest ||
           !checkDate ||
           !objectType ||
-          !ruleType ||
-          !value ||
           !result ||
           !severity ||
-          !objectName ||
-          !codeQualityRule
+          !objectName
         ) {
           throw new Error("Missing required field(s)");
         }
@@ -78,13 +77,14 @@ class AutomationLogHandler {
         const payload = {
           user: { ID: user },
           transportRequest,
-          subRequest,
+          subRequest: subRequest ? subRequest : "N/A",
           checkDate,
           result: cleanResult.toUpperCase(),
           severity,
           objectName,
-          codeQualityRule,
+          codeQualityRule: codeQualityRule ? codeQualityRule : null,
           baseRule: existingRule,
+          message: message ? message : "",
         };
 
         await cds.run(INSERT.into(AutomationLog).entries(payload));
