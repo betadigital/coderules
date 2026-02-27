@@ -1,5 +1,5 @@
 const cds = require("@sap/cds");
-const { BaseRules, AutomationLogs } = cds.entities;
+const { BaseRule, AutomationLog } = cds.entities;
 
 class AutomationLogHandler {
   /**
@@ -56,12 +56,12 @@ class AutomationLogHandler {
 
         // Ensure BaseRule exists
         let existingRule = await cds.run(
-          SELECT.one.from(BaseRules).where({ objectType, ruleType, value }),
+          SELECT.one.from(BaseRule).where({ objectType, ruleType, value }),
         );
 
         if (!existingRule) {
           await cds.run(
-            INSERT.into(BaseRules).entries({
+            INSERT.into(BaseRule).entries({
               objectType_code: objectType,
               ruleType_code: ruleType,
               value,
@@ -70,7 +70,7 @@ class AutomationLogHandler {
           );
           existingRule = await cds.run(
             SELECT.one
-              .from(BaseRules)
+              .from(BaseRule)
               .where({ objectType, ruleType_code: ruleType, value }),
           );
         }
@@ -87,7 +87,7 @@ class AutomationLogHandler {
           baseRule: existingRule,
         };
 
-        await cds.run(INSERT.into(AutomationLogs).entries(payload));
+        await cds.run(INSERT.into(AutomationLog).entries(payload));
         successful++;
       } catch (err) {
         console.error(`Failed to process log[${i}]:`, err.message);

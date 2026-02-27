@@ -1,7 +1,7 @@
 const cds = require("@sap/cds");
 
 // Entity references using deconstruction
-const { BaseRules, RuleTypes } = cds.entities("codeRules");
+const { BaseRule, RuleType } = cds.entities("codeRules");
 
 class BaseRuleCRUDHandler {
   /**
@@ -13,7 +13,7 @@ class BaseRuleCRUDHandler {
       return { code: 400, message: "ruleType_code and value are required." };
     }
 
-    const ruleType = await SELECT.one.from(RuleTypes).where({ code: ruleType_code });
+    const ruleType = await SELECT.one.from(RuleType).where({ code: ruleType_code });
     if (!ruleType)
       return { code: 400, message: `Unknown ruleType '${ruleType_code}'` };
 
@@ -61,7 +61,7 @@ class BaseRuleCRUDHandler {
     if (logicError) return req.error(logicError.code, logicError.message);
 
     const duplicate = await SELECT.one
-      .from(BaseRules)
+      .from(BaseRule)
       .where({ objectType, ruleType_code, value });
     if (duplicate)
       return req.error(409, `Rule already exists (ID: ${duplicate.ID})`);
@@ -72,7 +72,7 @@ class BaseRuleCRUDHandler {
    */
   static async beforeUpdate(req) {
     const keyID = req.params[0]?.ID || req.params[0];
-    const existingData = await SELECT.one.from(BaseRules).where({ ID: keyID });
+    const existingData = await SELECT.one.from(BaseRule).where({ ID: keyID });
     if (!existingData) return req.error(404, `Rule not found.`);
 
     const mergedData = { ...existingData, ...req.data };
@@ -81,7 +81,7 @@ class BaseRuleCRUDHandler {
 
     const { objectType_code, ruleType_code, value } = req.data;
     if (objectType_code || ruleType_code || value != null) {
-      const duplicate = await SELECT.one.from(BaseRules).where({
+      const duplicate = await SELECT.one.from(BaseRule).where({
         objectType_code: mergedData.objectType_code,
         ruleType_code: mergedData.ruleType_code,
         value: mergedData.value,
@@ -89,11 +89,6 @@ class BaseRuleCRUDHandler {
       });
       if (duplicate) return req.error(409, `An update would cause a conflict.`);
     }
-  }
-
-  static async logRequest(req) {
-    console.log(`[AUTH_CHECK] Event: ${req.event}, target: ${req.target?.name}`);
-    if (req.user) console.log(`User: ${req.user.id} | Roles: ${req.user.roles}`);
   }
 }
 

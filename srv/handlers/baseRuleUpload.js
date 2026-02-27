@@ -1,5 +1,5 @@
 const cds = require("@sap/cds");
-const { BaseRules } = cds.entities("codeRules");
+const { BaseRule } = cds.entities("codeRules");
 
 class BaseRuleUploadHandler {
   static async onFileUploadBaseRules(req) {
@@ -41,7 +41,7 @@ class BaseRuleUploadHandler {
       // Database duplicate check
       for (const r of rules) {
         const [exists] = await tx.run(
-          SELECT.from(BaseRules).where({
+          SELECT.from(BaseRule).where({
             objectType: r.objectType,
             ruleType: r.ruleType,
             value: r.value,
@@ -54,7 +54,7 @@ class BaseRuleUploadHandler {
           );
       }
 
-      await tx.run(INSERT.into(BaseRules).entries(rules));
+      await tx.run(INSERT.into(BaseRule).entries(rules));
       return `Successfully uploaded ${rules.length} Base Rules.`;
     } catch (err) {
       return req.error(500, `Upload failed: ${err.message}`);

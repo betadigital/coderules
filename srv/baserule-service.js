@@ -6,7 +6,10 @@ module.exports = cds.service.impl(async function () {
   const { BaseRules } = this.entities;
 
   // --- Global Hooks ---
-  this.before("*", CRUD.logRequest);
+  this.before("*", async (req) => {
+    console.log(`[AUTH_CHECK] Event: ${req.event}, target: ${req.target?.name}`);
+    if (req.user) console.log(`User: ${req.user.id} | Roles: ${req.user.roles}`);
+  });
 
   // --- Standard Persistence ---
   this.before("CREATE", BaseRules, CRUD.beforeCreate);
