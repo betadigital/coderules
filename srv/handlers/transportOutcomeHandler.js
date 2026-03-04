@@ -7,45 +7,56 @@ class TransportOutcomeHandler {
    * Processes an array of transport results and persists them.
    */
   static async onAddTransportOutcomes(req) {
-    console.log("addTransportOutcomes called");
     const { transportOutcomes } = req.data;
 
     if (!Array.isArray(transportOutcomes) || transportOutcomes.length === 0) {
       return req.error(400, "Outcomes must be a non-empty array");
     }
-
     let successful = 0;
     const failed = [];
 
-    for (let i = 0; i < transportOutcomes.length; i++) {
-      const entry = transportOutcomes[i];
+    // Use a for...of loop for cleaner async/await syntax
+    for (const [index, entry] of transportOutcomes.entries()) {
       try {
-        const { user_ID: user, transportRequest, failedChecks } = entry;
+        const { user_ID, transportRequest, failedChecks } = entry;
 
-        if (!user || !transportRequest || failedChecks === undefined) {
-          throw new Error(
-            "Missing required fields: user, transportRequest, or failedChecks",
-          );
+        if (!user_ID || !transportRequest || failedChecks === undefined) {
+          throw new Error("Missing required fields");
         }
 
+        // Check for existing record by the unique business key
+        const existing = await SELECT.one
+          .from(TransportOutcome)
+          .where({ transportRequest })
+          .columns("ID");
+
         const payload = {
-          user_ID: user,
-          transportRequest: transportRequest,
-          failedChecks: failedChecks,
+          user_ID,
+          transportRequest,
+          failedChecks,
         };
 
-        await cds.run(INSERT.into(TransportOutcome).entries(payload));
+        if (existing) {
+          // Update existing record
+          await UPDATE(TransportOutcome)
+            .set(payload)
+            .where({ ID: existing.ID });
+        } else {
+          // Create new record
+          await INSERT.into(TransportOutcome).entries(payload);
+        }
+
         successful++;
       } catch (err) {
-        console.error(`Failed to process transportOutcome[${i}]:`, err.message);
-        failed.push(i);
+        console.error(`Error at index ${index}:`, err.message);
+        failed.push(index);
       }
     }
 
-    const response = `${successful} of ${transportOutcomes.length} outcomes added successfully.`;
-    return failed.length
-      ? `${response} Failed indices: [${failed.join(", ")}]`
-      : response;
+    const message = `${successful} of ${transportOutcomes.length} outcomes processed.`;
+    return failed.length > 0
+      ? `${message} Failed indices: [${failed.join(", ")}]`
+      : message;
   }
 }
 
