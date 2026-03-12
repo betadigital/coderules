@@ -9,7 +9,7 @@ annotate service.BaseRules with @(
         {
             $Type : 'UI.DataField',
             Value : objectType_code,
-            Label : 'Object Type',
+            Label : '{i18n>ObjectType}',
         },
         {
             $Type : 'UI.DataField',
@@ -24,12 +24,12 @@ annotate service.BaseRules with @(
         {
             $Type : 'UI.DataField',
             Value : value,
-            Label : 'Rule Value',
+            Label : '{i18n>RuleValue}',
         },
         {
             $Type : 'UI.DataField',
             Value : Author,
-            Label : 'Author',
+            Label : '{i18n>Author}',
         },
         {
             $Type : 'UI.DataField',
@@ -38,12 +38,12 @@ annotate service.BaseRules with @(
         {
             $Type : 'UI.DataField',
             Value : severityRating,
-            Label : 'Severity ',
+            Label : '{i18n>Severity}',
         },
         {
             $Type : 'UI.DataField',
             Value : codeQualityRule,
-            Label : 'Code Quality Rule?',
+            Label : '{i18n>CodeQualityRule}',
         },
         {
             $Type : 'UI.DataField',

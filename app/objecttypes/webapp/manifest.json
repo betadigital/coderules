@@ -116,7 +116,6 @@
               "contextPath": "/ObjectTypes",
               "variantManagement": "Page",
               "creationMode": "NewPage",
-              "initialLoad": "Enabled",
               "navigation": {
                 "ObjectTypes": {
                   "detail": {
@@ -128,37 +127,25 @@
                 "@com.sap.vocabularies.UI.v1.LineItem#tableView": {
                   "tableSettings": {
                     "type": "ResponsiveTable",
-                    "selectionMode": "Multi"
+                    "selectionMode": "Multi",
+                    "width": "100%"
                   }
                 },
                 "@com.sap.vocabularies.UI.v1.LineItem#ListInactive": {
                   "actions": {
                     "DataFieldForAction::ObjectTypeService.makeManual": {
                       "enableOnSelect": "multi"
-                    }
-                  }
-                },
-                "@com.sap.vocabularies.UI.v1.LineItem#ListActive": {
-                  "actions": {
-                    "DataFieldForAction::ObjectTypeService.makeManual": {
+                    },
+                    "DataFieldForAction::ObjectTypeService.toggle": {
                       "enableOnSelect": "multi"
                     }
                   }
                 }
               },
               "views": {
-                "paths": [
-                  {
-                    "key": "tableView",
-                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
-                  },
-                  {
-                    "key": "tableView1",
-                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView1"
-                  }
-                ],
                 "showCounts": true
-              }
+              },
+              "defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
             }
           },
           "controlAggregation": "beginColumnPages",

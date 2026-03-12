@@ -34,6 +34,7 @@ class AutomationLogHandler {
           objectName,
           message,
           codeQualityRule,
+          codeLine,
         } = log;
 
         if (
@@ -85,6 +86,7 @@ class AutomationLogHandler {
           codeQualityRule: codeQualityRule ? codeQualityRule : null,
           baseRule: existingRule,
           message: message ? message : "",
+          codeLine: codeLine,
         };
 
         await cds.run(INSERT.into(AutomationLog).entries(payload));

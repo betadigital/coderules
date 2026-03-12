@@ -25,7 +25,8 @@ service RuleService @(path: '/codeRuleService') {
         objectName       : String;
         severity         : Int16;
         codeQualityRule  : Boolean;
-        message: String;
+        message          : String;
+        codeLine         : String;
     }
 
     type Outcome {
@@ -34,16 +35,16 @@ service RuleService @(path: '/codeRuleService') {
         failedChecks     : Boolean;
     }
 
-    entity TransportOutcomes as projection on codeRules.TransportOutcome {
-        *,
-        case 
-            failedChecks
-            when false
-                then 'PASSED'
-            else
-                'FAILED'
+    entity TransportOutcomes as
+        projection on codeRules.TransportOutcome {
+            *,
+            case
+                failedChecks
+                when false
+                     then 'PASSED'
+                else 'FAILED'
             end as statusText : String
-    };
+        };
 
 
     @Capabilities.InsertRestrictions.Insertable: false
@@ -94,9 +95,9 @@ service RuleService @(path: '/codeRuleService') {
             ) ruleType : redirected to RuleTypes
         };
 
-            @odata.draft.enabled
-            @odata.draft.bypass
-            @Common.Label           : 'Code User'
+    @odata.draft.enabled
+    @odata.draft.bypass
+    @Common.Label: 'Code User'
     entity CodeUsers         as
         projection on codeRules.CodeUser {
             @(

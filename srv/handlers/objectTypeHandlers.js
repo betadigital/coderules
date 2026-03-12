@@ -32,14 +32,24 @@ class ObjectTypeHandlers {
    * Action: addProgrammableType
    */
   static async onAddProgrammableType(req) {
-    const { code } = req.data;
+    const { code, is_excluded } = req.data;
+
     if (!code) return req.error(400, "Code parameter is required");
 
-    const n = await UPDATE(ObjectType).set({ manual: false }).where({ code: code });
-    if (n === 0) return req.error(404, `Object Type with code '${code}' not found.`);
+    const isActive = !is_excluded;
 
-    // Return null to force hard refresh as per original logic
-    return;
+    const n = await UPDATE(ObjectType)
+      .set({
+        manual: false,
+        active: isActive,
+      })
+      .where({ code: code });
+
+    if (n === 0) {
+      return req.error(404, `Object Type with code '${code}' not found.`);
+    }
+
+    return; // Hard refresh trigger
   }
 
   /**
@@ -54,7 +64,8 @@ class ObjectTypeHandlers {
       .set({ manual: true, active: false })
       .where({ code: code });
 
-    if (n === 0) return req.error(404, `Object Type with code '${code}' not found.`);
+    if (n === 0)
+      return req.error(404, `Object Type with code '${code}' not found.`);
 
     return await SELECT.one.from(ObjectType).where({ code: code });
   }
@@ -83,6 +94,32 @@ class ObjectTypeHandlers {
 
     req.notify({
       message: `Successfully set ObjectType ${updatedObject.code} to inactive.`,
+      type: "success",
+    });
+
+    return updatedObject;
+  }
+
+  static async onToggle(req) {
+    const ID = req.params[0].code || req.params.code;
+
+    if (!ID) {
+      return req.error(404, "Object type not found..");
+    }
+
+    const objectType = await cds.run(
+      SELECT.one.from(req.subject).where({ code: ID }).columns("active"),
+    );
+
+    if (!objectType) {
+      return req.error(404, "Object type not found with ID: ", ID);
+    }
+
+    await cds.run(UPDATE(req.subject).with({ active: !objectType.active }));
+    const updatedObject = await cds.run(SELECT.one.from(req.subject));
+
+    req.notify({
+      message: `Successfully toggled ObjectType ${updatedObject.code}.`,
       type: "success",
     });
 

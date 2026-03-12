@@ -68,19 +68,25 @@ entity CodeUser : managed {
 entity AutomationLog : cuid {
     @mandatory
     user             : Association to one CodeUser;
+
     @mandatory
     transportRequest : String(20);
     subRequest       : String(20);
+
     @mandatory
     checkDate        : DateTime;
     baseRule         : Association to one BaseRule;
+
     @mandatory
     objectName       : String(200);
     severity         : Int16;
+
     @mandatory
     result           : String(10);
     codeQualityRule  : Boolean;
-    message: String;
+    message          : String;
+    codeLine         : String;
+
 }
 
 entity TransportOutcome : cuid, managed {
