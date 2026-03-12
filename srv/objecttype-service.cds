@@ -14,7 +14,7 @@ service ObjectTypeService @(path: '/objectTypeService') {
         Deletable : false,
         Updatable : false
     }
-    entity ManualObjectTypes as
+    entity ManualObjectTypes   as
         projection on codeRules.ObjectType {
             key code,
                 description,
@@ -24,6 +24,24 @@ service ObjectTypeService @(path: '/objectTypeService') {
         }
         where
             manual = true;
+
+    @readonly
+    @Capabilities: {
+        Insertable: false,
+        Deletable : false,
+        Updatable : false
+    }
+    entity ExcludedObjectTypes as
+        projection on codeRules.ObjectType {
+            key code,
+                description,
+                programId,
+                manual,
+                active
+        }
+        where
+            excluded = true;
+
 
     // -------------------------------------------------------------------------
     // 2. Programmable Object Types (The "Active" List)
@@ -35,14 +53,9 @@ service ObjectTypeService @(path: '/objectTypeService') {
         Insertable: false,
         Deletable : false,
     }
-    entity ObjectTypes       as
+    entity ObjectTypes         as
         projection on codeRules.ObjectType {
             *,
-            case
-                when active = true
-                     then false
-                else true
-            end as isExcluded : Boolean @Common.Label: 'Is Excluded?'
         }
         where
             manual = false;
@@ -63,6 +76,9 @@ service ObjectTypeService @(path: '/objectTypeService') {
             'ManualObjectTypes'
         ]}
         action makeManual()   returns ObjectTypes;
+
+        @Common.SideEffects: {TargetProperties: ['excluded']}
+        action exclude()      returns ObjectTypes;
     };
 
     // -------------------------------------------------------------------------

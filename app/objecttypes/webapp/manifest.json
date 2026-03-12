@@ -126,8 +126,6 @@
               "controlConfiguration": {
                 "@com.sap.vocabularies.UI.v1.LineItem#tableView": {
                   "tableSettings": {
-                    "type": "ResponsiveTable",
-                    "selectionMode": "Multi",
                     "width": "100%"
                   }
                 },
@@ -143,7 +141,22 @@
                 }
               },
               "views": {
-                "showCounts": true
+                "showCounts": true,
+                "paths": [
+                  {
+                    "key": "tableView",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
+                  },
+                  {
+                    "key": "tableView1",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView1"
+                  },
+                  {
+                    "key": "tableView2",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
+                    "entitySet": "ExcludedObjectTypes"
+                  }
+                ]
               },
               "defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
             }

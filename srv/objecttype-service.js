@@ -15,4 +15,5 @@ module.exports = cds.service.impl(async function () {
   this.on("makeActive", ObjectTypes, ObjectTypeHandlers.onMakeActive);
   this.on("makeInactive", ObjectTypes, ObjectTypeHandlers.onMakeInactive);
   this.on("toggle", ObjectTypes, ObjectTypeHandlers.onToggle);
+  this.on("exclude", ObjectTypes, ObjectTypeHandlers.onExclude);
 });

@@ -125,6 +125,32 @@ class ObjectTypeHandlers {
 
     return updatedObject;
   }
+
+  static async onExclude(req) {
+    const ID = req.params[0].code || req.params.code;
+
+    if (!ID) {
+      return req.error(404, "Object type not found..");
+    }
+
+    const objectType = await cds.run(
+      SELECT.one.from(req.subject).where({ code: ID }).columns("excluded"),
+    );
+
+    if (!objectType) {
+      return req.error(404, "Object type not found with ID: ", ID);
+    }
+
+    await cds.run(UPDATE(req.subject).with({ excluded: true }));
+    const updatedObject = await cds.run(SELECT.one.from(req.subject));
+
+    req.notify({
+      message: `Successfully excluded ObjectType ${updatedObject.code}.`,
+      type: "success",
+    });
+
+    return updatedObject;
+  }
 }
 
 module.exports = ObjectTypeHandlers;

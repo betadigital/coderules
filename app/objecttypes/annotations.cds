@@ -47,22 +47,8 @@ annotate service.ObjectTypes with @(
         },
         {
             $Type : 'UI.DataFieldForAction',
-            Action: 'ObjectTypeService.toggle',
-            Label : '{i18n>ToggleExclusion}',
-        },
-        {
-            $Type : 'UI.DataFieldForAction',
-            Action: 'ObjectTypeService.makeManual',
-            Label : '{i18n>MarkAsManualReview}',
-        },
-        {
-            $Type : 'UI.DataFieldForAction',
             Action: 'ObjectTypeService.EntityContainer/addProgrammableType',
             Label : '{i18n>AddObjectType}',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : isExcluded,
         },
     ],
 
@@ -71,19 +57,124 @@ annotate service.ObjectTypes with @(
     // -----------------------------------------------------------------------
     UI.SelectionPresentationVariant #tableView: {
         $Type              : 'UI.SelectionPresentationVariantType',
-        Text               : '{i18n>ObjectTypes}',
+        Text               : '{i18n>ExcludedObjectTypes}',
         PresentationVariant: {
             $Type         : 'UI.PresentationVariantType',
             Visualizations: ['@UI.LineItem#ListInactive'], // <--- Updated
-            SortOrder     : [{
-                $Type     : 'Common.SortOrderType',
-                Property  : active,
-                Descending: false,
-            }, ],
         },
         SelectionVariant   : {
             $Type        : 'UI.SelectionVariantType',
-            SelectOptions: []
+            SelectOptions: [
+                {
+                    $Type : 'UI.SelectOptionType',
+                    PropertyName : excluded,
+                    Ranges : [
+                        {
+                            Sign : #I,
+                            Option : #EQ,
+                            Low : true,
+                        },
+                    ],
+                },
+            ]
         }
-    }
+    },
+    UI.LineItem #tableView : [
+        {
+            $Type : 'UI.DataField',
+            Value : code,
+            Label : '{i18n>Code}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : description,
+            Label : '{i18n>Description}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : active,
+            Label : '{i18n>IsActive1}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeManual',
+            Label : '{i18n>MarkAsManualReview}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.EntityContainer/addProgrammableType',
+            Label : '{i18n>AddObjectType}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeActive',
+            Label : '{i18n>MakeActive}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeInactive',
+            Label : '{i18n>MakeInactive}',
+        },
+    ],
+    UI.SelectionPresentationVariant #tableView1 : {
+        $Type : 'UI.SelectionPresentationVariantType',
+        PresentationVariant : {
+            $Type : 'UI.PresentationVariantType',
+            Visualizations : [
+                '@UI.LineItem#tableView',
+            ],
+        },
+        SelectionVariant : {
+            $Type : 'UI.SelectionVariantType',
+            SelectOptions : [
+                {
+                    $Type : 'UI.SelectOptionType',
+                    PropertyName : excluded,
+                    Ranges : [
+                        {
+                            Sign : #I,
+                            Option : #EQ,
+                            Low : false,
+                        },
+                    ],
+                },
+            ],
+        },
+        Text : '{i18n>IncludedObjectTypes}',
+    },
 );
+annotate service.ExcludedObjectTypes with @(
+    UI.LineItem #tableView : [
+        {
+            $Type : 'UI.DataField',
+            Value : code,
+            Label : '{i18n>Code1}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : description,
+            Label : '{i18n>Description}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : manual,
+            Label : '{i18n>Manual}',
+        },
+    ],
+    UI.SelectionPresentationVariant #tableView : {
+        $Type : 'UI.SelectionPresentationVariantType',
+        PresentationVariant : {
+            $Type : 'UI.PresentationVariantType',
+            Visualizations : [
+                '@UI.LineItem#tableView',
+            ],
+        },
+        SelectionVariant : {
+            $Type : 'UI.SelectionVariantType',
+            SelectOptions : [
+            ],
+        },
+        Text : '{i18n>AllExcludedObjectTypes}',
+    },
+);
+

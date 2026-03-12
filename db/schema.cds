@@ -14,6 +14,7 @@ entity ObjectType {
         description : String(75);
         programId   : String(5);
         active      : Boolean;
+        excluded    : Boolean;
         manual      : Boolean;
 }
 
