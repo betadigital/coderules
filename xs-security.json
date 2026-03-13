@@ -1,5 +1,5 @@
 {
-  "xsappname": "SA-Power-CRR",
+  "xsappname": "code-review-rules",
   "tenant-mode": "dedicated",
   "description": "Security for Code Review Rule App",
   "scopes": [
@@ -20,7 +20,10 @@
     {
       "name": "$XSAPPNAME.RuleM2M",
       "description": "M2M authorisation scope.",
-      "grant-as-authority-to-apps": []
+      "grant-as-authority-to-apps": [
+        "sb-code-review-rules!t76906",
+        "sb-code-review-rules!t59395"
+      ]
     }
   ],
   "authorities": ["$XSAPPNAME.RuleM2M"],
