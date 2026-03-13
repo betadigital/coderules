@@ -1,7 +1,7 @@
 _schema-version: 3.3.0
-ID: code-review-rules
-version: 1.5.0
-description: "CAP Project with Fiori Frontend and Full AuthZ/AuthN"
+ID: SA-Power-CRR
+version: 1.0.0
+description: "SAP CAP App with Fiori UIs for SA Power code review"
 parameters:
   enable-parallel-deployments: true
   deploy_mode: html5-repo
@@ -13,7 +13,7 @@ build-parameters:
         - npx cds build --production
 
 modules:
-  - name: code-review-rules-srv
+  - name: SA-Power-CRR-srv
     type: nodejs
     path: gen/srv
     parameters:
@@ -26,19 +26,19 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
-      - name: code-review-rules-auth
-      - name: code-review-rules-db
-      - name: code-review-rules-destination
+      - name: SA-Power-CRR-auth
+      - name: SA-Power-CRR-db
+      - name: SA-Power-CRR-destination
 
-  - name: code-review-rules-db-deployer
+  - name: SA-Power-CRR-db-deployer
     type: hdb
     path: gen/db
     parameters:
       buildpack: nodejs_buildpack
     requires:
-      - name: code-review-rules-db
+      - name: SA-Power-CRR-db
 
-  - name: code-review-rules
+  - name: SA-Power-CRR
     type: approuter.nodejs
     path: app/router
     parameters:
@@ -52,23 +52,23 @@ modules:
           name: srv-api
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: code-review-rules-auth
-      - name: code-review-rules-destination
-      - name: code-review-rules-html5-runtime
+      - name: SA-Power-CRR-auth
+      - name: SA-Power-CRR-destination
+      - name: SA-Power-CRR-html5-runtime
     provides:
       - name: app-api
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
 
-  - name: code-review-rules-app-deployer
+  - name: SA-Power-CRR-app-deployer
     type: com.sap.application.content
     path: .
     parameters:
       app-config:
         overwrite: true
     requires:
-      - name: code-review-rules-html5-repo-host
+      - name: SA-Power-CRR-html5-repo-host
         parameters:
           content-target: true
     build-parameters:
@@ -150,7 +150,7 @@ modules:
 
 resources:
   # XSUAA Service pointing to your existing instance
-  - name: code-review-rules-auth
+  - name: SA-Power-CRR-auth
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
@@ -158,26 +158,26 @@ resources:
       path: ./xs-security.json
       config:
         tenant-mode: dedicated
-        xsappname: code-review-rules
+        xsappname: SA-Power-CRR
         oauth2-configuration:
           redirect-uris:
             - https://*.cfapps.*.hana.ondemand.com/login/callback # Generic callback
             - https://*.${default-domain}/login/callback
             - https://*~{app-api/app-uri}/**
         role-collections:
-          - name: "RuleAdmin (code-review-rules ${org}-${space})"
+          - name: "RuleAdmin (SA-Power-CRR ${org}-${space})"
             description: "generated"
             role-template-references:
               - "$XSAPPNAME.RuleAdmin"
-          - name: "RuleReader (code-review-rules ${org}-${space})"
+          - name: "RuleReader (SA-Power-CRR ${org}-${space})"
             description: "generated"
             role-template-references:
               - "$XSAPPNAME.RuleReader"
-          - name: "RuleCreator (code-review-rules ${org}-${space})"
+          - name: "RuleCreator (SA-Power-CRR ${org}-${space})"
             description: "generated"
             role-template-references:
               - "$XSAPPNAME.RuleCreator"
-          - name: "RuleM2M (code-review-rules ${org}-${space})"
+          - name: "RuleM2M (SA-Power-CRR ${org}-${space})"
             description: "generated"
             role-template-references:
               - "$XSAPPNAME.RuleM2m"
@@ -185,28 +185,28 @@ resources:
       - name: app-api
 
   # HDI Container (HANA)
-  - name: code-review-rules-db
+  - name: SA-Power-CRR-db
     type: org.cloudfoundry.managed-service
     parameters:
       service: hana
       service-plan: hdi-shared
 
   # Destination Service
-  - name: code-review-rules-destination
+  - name: SA-Power-CRR-destination
     type: org.cloudfoundry.managed-service
     parameters:
       service: destination
       service-plan: lite
 
   # HTML5 Repo Host
-  - name: code-review-rules-html5-repo-host
+  - name: SA-Power-CRR-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
 
   # HTML5 Repo Runtime
-  - name: code-review-rules-html5-runtime
+  - name: SA-Power-CRR-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo

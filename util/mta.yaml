@@ -137,6 +137,16 @@ modules:
         - npm install
         - npm run build:cf
       supported-platforms: []
+  - name: codereviewrulestransportoutcomesapp
+    type: html5
+    path: app/transportoutcomesapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
 
 resources:
   # XSUAA Service pointing to your existing instance
