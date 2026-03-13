@@ -21,6 +21,7 @@ annotate service.TransportOutcomes with @(
             $Type : 'UI.DataField',
             Value : failedChecks,
             Label : 'Failed Checks?',
+            Criticality : checkScore,
         },
         {
             $Type : 'UI.DataField',

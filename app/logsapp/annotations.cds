@@ -132,6 +132,7 @@ annotate service.AutomationLogs with @(
                 $Type : 'UI.DataField',
                 Value : result,
                 Label : 'Result',
+                Criticality : resultScore,
             },
             {
                 $Type : 'UI.DataField',

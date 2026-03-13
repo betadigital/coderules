@@ -11,6 +11,7 @@ annotate service.CodeUsers with @(
             $Type : 'UI.DataField',
             Value : trusted,
             Label : '{i18n>Trusted}',
+            Criticality : trust_score,
         },
         {
             $Type: 'UI.DataField',

@@ -43,7 +43,12 @@ service RuleService @(path: '/codeRuleService') {
                 when false
                      then 'PASSED'
                 else 'FAILED'
-            end as statusText : String
+            end as statusText : String,
+            case
+                when failedChecks = false
+                     then 3
+                else 1
+            end as checkScore : Integer
         };
 
 
@@ -118,7 +123,12 @@ service RuleService @(path: '/codeRuleService') {
                          then false
                     else true
                 end as Boolean
-            ) as untrusted
+            )   as untrusted,
+            case
+                when trusted = true
+                     then 3
+                else 1
+            end as trust_score : Integer
         }
         actions {
 
@@ -144,7 +154,15 @@ service RuleService @(path: '/codeRuleService') {
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false
-    entity AutomationLogs    as projection on codeRules.AutomationLog;
+    entity AutomationLogs    as
+        projection on codeRules.AutomationLog {
+            *,
+            case 
+            when result = 'PASS' then 3 
+            else 1 
+        end as resultScore : Integer
+
+        };
 
 
     action   addLogs(logs: array of Log)                               returns String;
