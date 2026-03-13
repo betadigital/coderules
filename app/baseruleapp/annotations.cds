@@ -3,11 +3,6 @@ annotate service.BaseRules with @(
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
-            Value : ID,
-            Label : 'ID',
-        },
-        {
-            $Type : 'UI.DataField',
             Value : objectType_code,
             Label : '{i18n>ObjectType}',
         },
@@ -100,8 +95,8 @@ annotate service.BaseRules with @(
         ],
     },
     UI.HeaderInfo : {
-        TypeName : 'Base Rule',
-        TypeNamePlural : 'Base Rules',
+        TypeName : 'Code Review Rule',
+        TypeNamePlural : 'Code Review Rules',
         Title : {
             $Type : 'UI.DataField',
             Value : ID,
@@ -140,5 +135,32 @@ annotate service.BaseRules with @(
             },
         ],
     },
+    UI.SelectionFields : [
+        objectType_code,
+        ruleType_code,
+        severityRating,
+        isActive,
+        codeQualityRule,
+    ],
 );
+
+annotate service.BaseRules with {
+    objectType @Common.Label : '{i18n>ObjectType}'
+};
+
+annotate service.BaseRules with {
+    ruleType @Common.Label : '{i18n>RuleType}'
+};
+
+annotate service.BaseRules with {
+    severityRating @Common.Label : '{i18n>Severity1}'
+};
+
+annotate service.BaseRules with {
+    isActive @Common.Label : '{i18n>IsActive}'
+};
+
+annotate service.BaseRules with {
+    codeQualityRule @Common.Label : '{i18n>CodeQualityRule}'
+};
 

@@ -6,7 +6,7 @@
     "metadataFilename": "",
     "serviceUrl": "http://localhost:4004/baseRuleService/",
     "appName": "baseruleapp",
-    "appTitle": "Base Rule Creation portal",
+    "appTitle": "Automated Code Review Rules",
     "appDescription": "Create new base rule templates",
     "appNamespace": "",
     "ui5Theme": "sap_horizon_dark",

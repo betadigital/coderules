@@ -4,7 +4,7 @@ annotate service.AutomationLogs with @(
         {
             $Type : 'UI.DataField',
             Value : user_ID,
-            Label : '{i18n>User}',
+            Label : '{i18n>Developer}',
         },
         {
             $Type : 'UI.DataField',
@@ -55,7 +55,7 @@ annotate service.AutomationLogs with @(
     UI.HeaderFacets : [
         {
             $Type : 'UI.ReferenceFacet',
-            Label : 'Log Information',
+            Label : 'Information',
             ID : 'LogInformation',
             Target : '@UI.FieldGroup#LogInformation',
         },
@@ -65,8 +65,8 @@ annotate service.AutomationLogs with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Value : ID,
-                Label : 'ID',
+                Value : user_ID,
+                Label : 'User ',
             },
             {
                 $Type : 'UI.DataField',
@@ -77,16 +77,6 @@ annotate service.AutomationLogs with @(
                 $Type : 'UI.DataField',
                 Value : subRequest,
                 Label : '{i18n>SubRequest}',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : result,
-                Label : 'Result',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : user_ID,
-                Label : 'User ',
             },
             {
                 $Type : 'UI.DataField',
@@ -113,29 +103,84 @@ annotate service.AutomationLogs with @(
                 Value : baseRule.objectType_code,
                 Label : 'Object Type',
             },
-            {
-                $Type : 'UI.DataField',
-                Value : codeQualityRule,
-                Label : 'Is Code Quality rule?',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : message,
-                Label : 'Message',
-            },
         ],
     },
     UI.HeaderInfo : {
-        TypeName : 'Automation Log',
-        TypeNamePlural : 'Automation Logs',
+        TypeName : 'Code Review Log',
+        TypeNamePlural : 'Code Review Logs',
         Description : {
             $Type : 'UI.DataField',
             Value : 'Detailed log information ',
         },
         Title : {
             $Type : 'UI.DataField',
-            Value : ID,
+            Value : result,
         },
     },
+    UI.Facets : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            Label : 'Code Review Details',
+            ID : 'CodeReviewDetails',
+            Target : '@UI.FieldGroup#CodeReviewDetails',
+        },
+    ],
+    UI.FieldGroup #CodeReviewDetails : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : result,
+                Label : 'Result',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : codeLine,
+                Label : '{i18n>CodeLine}',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : codeQualityRule,
+                Label : '{i18n>CodeQualityRule}',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : message,
+                Label : '{i18n>Message}',
+            },
+        ],
+    },
+    UI.SelectionFields : [
+        transportRequest,
+        subRequest,
+        baseRule.objectType_code,
+        baseRule.ruleType_code,
+        objectName,
+        codeQualityRule,
+    ],
 );
+
+annotate service.AutomationLogs with {
+    transportRequest @Common.Label : '{i18n>TransportReq}'
+};
+
+annotate service.AutomationLogs with {
+    subRequest @Common.Label : '{i18n>SubRequest}'
+};
+
+annotate service.AutomationLogs with {
+    objectName @Common.Label : '{i18n>ObjectName}'
+};
+
+annotate service.AutomationLogs with {
+    codeQualityRule @Common.Label : '{i18n>CodeQualityRule}'
+};
+
+annotate service.BaseRules with {
+    objectType @Common.Label : '{i18n>ObjectType}'
+};
+
+annotate service.BaseRules with {
+    ruleType @Common.Label : '{i18n>RuleType}'
+};
 

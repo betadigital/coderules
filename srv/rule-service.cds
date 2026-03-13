@@ -97,7 +97,7 @@ service RuleService @(path: '/codeRuleService') {
 
     @odata.draft.enabled
     @odata.draft.bypass
-    @Common.Label: 'Code User'
+    @Common.Label: 'Developer'
     entity CodeUsers         as
         projection on codeRules.CodeUser {
             @(
@@ -140,6 +140,7 @@ service RuleService @(path: '/codeRuleService') {
         };
 
 
+    @readonly
     @Capabilities.InsertRestrictions.Insertable: false
     @Capabilities.UpdateRestrictions.Updatable : false
     @Capabilities.DeleteRestrictions.Deletable : false

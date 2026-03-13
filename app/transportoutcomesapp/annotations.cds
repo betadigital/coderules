@@ -5,6 +5,7 @@ annotate service.TransportOutcomes with @(
             $Type : 'UI.DataField',
             Value : ID,
             Label : 'ID',
+            @UI.Hidden,
         },
         {
             $Type : 'UI.DataField',
@@ -14,7 +15,7 @@ annotate service.TransportOutcomes with @(
         {
             $Type : 'UI.DataField',
             Value : user_ID,
-            Label : 'User ID',
+            Label : '{i18n>Developer1}',
         },
         {
             $Type : 'UI.DataField',
@@ -75,5 +76,17 @@ annotate service.TransportOutcomes with @(
             Value : transportRequest,
         },
     },
+    UI.SelectionFields : [
+        transportRequest,
+        user_ID,
+    ],
 );
+
+annotate service.TransportOutcomes with {
+    transportRequest @Common.Label : '{i18n>TransportReq}'
+};
+
+annotate service.TransportOutcomes with {
+    user @Common.Label : '{i18n>DeveloperId}'
+};
 

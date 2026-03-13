@@ -5,12 +5,12 @@ annotate service.CodeUsers with @(
         {
             $Type: 'UI.DataField',
             Value: ID,
-            Label: 'ID',
+            Label: '{i18n>DeveloperId}',
         },
         {
             $Type : 'UI.DataField',
             Value : trusted,
-            Label : 'Trusted',
+            Label : '{i18n>Trusted}',
         },
         {
             $Type: 'UI.DataField',
@@ -53,11 +53,6 @@ annotate service.CodeUsers with @(
                 Value: modifiedBy,
                 Label: 'Modified by',
             },
-            {
-                $Type : 'UI.DataField',
-                Value : trusted,
-                Label : 'Is Trusted?',
-            },
         ],
     },
     UI.FieldGroup #AdminInfo1: {
@@ -73,12 +68,8 @@ annotate service.CodeUsers with @(
         },
     ],
     UI.HeaderInfo            : {
-        TypeName      : 'Code User',
-        TypeNamePlural: 'Code Users',
-        Description   : {
-            $Type: 'UI.DataField',
-            Value: 'User page for a user with write-access to codebase',
-        },
+        TypeName       : 'Developer',
+        TypeNamePlural : 'Developers',
         Title : {
             $Type : 'UI.DataField',
             Value : ID,
@@ -120,8 +111,30 @@ annotate service.CodeUsers with @(
                 Value : isActive,
                 Label : 'Is Active?',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : trusted,
+                Label : 'Is Trusted?',
+            },
         ],
     },
+    UI.SelectionFields : [
+        ID,
+        trusted,
+        isActive,
+    ],
 );
 
+
+annotate service.CodeUsers with {
+    trusted @Common.Label : '{i18n>Trusted}'
+};
+
+annotate service.CodeUsers with {
+    isActive @Common.Label : '{i18n>Active}'
+};
+
+annotate service.CodeUsers with {
+    ID @Common.Label : '{i18n>DeveloperId}'
+};
 

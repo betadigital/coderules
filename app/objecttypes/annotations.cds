@@ -38,7 +38,7 @@ annotate service.ObjectTypes with @(
         {
             $Type: 'UI.DataField',
             Value: code,
-            Label: 'Code'
+            Label: '{i18n>ObjectType}'
         },
         {
             $Type: 'UI.DataField',
@@ -49,6 +49,21 @@ annotate service.ObjectTypes with @(
             $Type : 'UI.DataFieldForAction',
             Action: 'ObjectTypeService.EntityContainer/addProgrammableType',
             Label : '{i18n>AddObjectType}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : active,
+            Label : '{i18n>Active}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeInactive',
+            Label : '{i18n>MakeInactive}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.makeActive',
+            Label : '{i18n>MakeActive1}',
         },
     ],
 
@@ -83,7 +98,7 @@ annotate service.ObjectTypes with @(
         {
             $Type : 'UI.DataField',
             Value : code,
-            Label : '{i18n>Code}',
+            Label : '{i18n>ObjectType}',
         },
         {
             $Type : 'UI.DataField',
@@ -93,17 +108,7 @@ annotate service.ObjectTypes with @(
         {
             $Type : 'UI.DataField',
             Value : active,
-            Label : '{i18n>IsActive1}',
-        },
-        {
-            $Type : 'UI.DataFieldForAction',
-            Action : 'ObjectTypeService.makeManual',
-            Label : '{i18n>MarkAsManualReview}',
-        },
-        {
-            $Type : 'UI.DataFieldForAction',
-            Action : 'ObjectTypeService.EntityContainer/addProgrammableType',
-            Label : '{i18n>AddObjectType}',
+            Label : '{i18n>IsActive}',
         },
         {
             $Type : 'UI.DataFieldForAction',
@@ -114,6 +119,11 @@ annotate service.ObjectTypes with @(
             $Type : 'UI.DataFieldForAction',
             Action : 'ObjectTypeService.makeInactive',
             Label : '{i18n>MakeInactive}',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ObjectTypeService.EntityContainer/addProgrammableType',
+            Label : '{i18n>AddObjectType}',
         },
     ],
     UI.SelectionPresentationVariant #tableView1 : {

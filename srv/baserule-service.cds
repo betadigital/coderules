@@ -20,10 +20,12 @@ service BaseRuleService @(path: '/baseRuleService') {
         }
         where
                 manual   = false
-            and excluded = false;
+            and excluded = false
+            and active = true;
 
 
     @odata.draft.enabled
+    @Common.Label: 'Code Review Rule'
     entity BaseRules   as
         projection on codeRules.BaseRule {
             ID,

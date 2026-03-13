@@ -6,7 +6,7 @@
     "metadataFilename": "",
     "serviceUrl": "http://localhost:4004/codeRuleService/",
     "appName": "userrulesapp",
-    "appTitle": "User code rules app",
+    "appTitle": "Code Review Developers app",
     "appDescription": "An SAP Fiori application.",
     "appNamespace": "",
     "ui5Theme": "sap_horizon_dark",
