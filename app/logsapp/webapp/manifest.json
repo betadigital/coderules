@@ -17,14 +17,33 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/codeRuleService/",
+        "uri": "/srv/codeRuleService/",
         "type": "OData",
         "settings": {
           "annotations": [],
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "viewLogs": {
+          "semanticObject": "codereviewlog",
+          "action": "view",
+          "title": "View Code Review Logs",
+          "subTitle": "",
+          "icon": "sap-icon://customer-history",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "crr.cap.service"
   },
   "sap.ui": {
     "technology": "UI5",
@@ -93,17 +112,12 @@
         {
           "pattern": ":?query:",
           "name": "AutomationLogsList",
-          "target": [
-            "AutomationLogsList"
-          ]
+          "target": ["AutomationLogsList"]
         },
         {
           "pattern": "AutomationLogs({key}):?query:",
           "name": "AutomationLogsObjectPage",
-          "target": [
-            "AutomationLogsList",
-            "AutomationLogsObjectPage"
-          ]
+          "target": ["AutomationLogsList", "AutomationLogsObjectPage"]
         }
       ],
       "targets": {

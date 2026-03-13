@@ -17,14 +17,33 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/codeRuleService/",
+        "uri": "/srv/codeRuleService/",
         "type": "OData",
         "settings": {
           "annotations": [],
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "viewTransports": {
+          "semanticObject": "transportrequest",
+          "action": "view",
+          "icon": "sap-icon://shipping-status",
+          "title": "View Transport Requests",
+          "subTitle": "Monitor transport check results",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "crr.cap.service"
   },
   "sap.ui": {
     "technology": "UI5",
@@ -93,17 +112,12 @@
         {
           "pattern": ":?query:",
           "name": "TransportOutcomesList",
-          "target": [
-            "TransportOutcomesList"
-          ]
+          "target": ["TransportOutcomesList"]
         },
         {
           "pattern": "TransportOutcomes({key}):?query:",
           "name": "TransportOutcomesObjectPage",
-          "target": [
-            "TransportOutcomesList",
-            "TransportOutcomesObjectPage"
-          ]
+          "target": ["TransportOutcomesList", "TransportOutcomesObjectPage"]
         }
       ],
       "targets": {

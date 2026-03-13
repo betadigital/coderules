@@ -17,14 +17,33 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/codeRuleService/",
+        "uri": "/srv/codeRuleService/",
         "type": "OData",
         "settings": {
           "annotations": [],
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "manageDevelopers": {
+          "semanticObject": "codedeveloper",
+          "action": "manage",
+          "title": "Manage Code Rule Developers",
+          "subTitle": "",
+          "icon": "sap-icon://customer-and-contacts",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "crr.cap.service"
   },
   "sap.ui": {
     "technology": "UI5",
@@ -93,17 +112,12 @@
         {
           "pattern": ":?query:",
           "name": "CodeUsersList",
-          "target": [
-            "CodeUsersList"
-          ]
+          "target": ["CodeUsersList"]
         },
         {
           "pattern": "CodeUsers({key}):?query:",
           "name": "CodeUsersObjectPage",
-          "target": [
-            "CodeUsersList",
-            "CodeUsersObjectPage"
-          ]
+          "target": ["CodeUsersList", "CodeUsersObjectPage"]
         }
       ],
       "targets": {

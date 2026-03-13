@@ -148,9 +148,6 @@ modules:
       build-result: dist
       builder: custom
       commands: [npm install, npm run build:cf]
-      supported-platforms: []
-    requires:
-      - name: SA-Power-CRR-html5-repo-host
 
   - name: codereviewrulesuserrulesapp
     type: html5
@@ -159,9 +156,6 @@ modules:
       build-result: dist
       builder: custom
       commands: [npm install, npm run build:cf]
-      supported-platforms: []
-    requires:
-      - name: SA-Power-CRR-html5-repo-host
 
   - name: codereviewruleslogsapp
     type: html5
@@ -170,9 +164,6 @@ modules:
       build-result: dist
       builder: custom
       commands: [npm install, npm run build:cf]
-      supported-platforms: []
-    requires:
-      - name: SA-Power-CRR-html5-repo-host
 
   - name: codereviewrulesobjecttypes
     type: html5
@@ -181,9 +172,6 @@ modules:
       build-result: dist
       builder: custom
       commands: [npm install, npm run build:cf]
-      supported-platforms: []
-    requires:
-      - name: SA-Power-CRR-html5-repo-host
 
   - name: codereviewrulestransportoutcomesapp
     type: html5
@@ -192,9 +180,6 @@ modules:
       build-result: dist
       builder: custom
       commands: [npm install, npm run build:cf]
-      supported-platforms: []
-    requires:
-      - name: SA-Power-CRR-html5-repo-host
 
 resources:
   # --------------------------------------------------

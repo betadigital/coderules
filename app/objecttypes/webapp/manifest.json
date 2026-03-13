@@ -17,11 +17,26 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/objectTypeService/",
+        "uri": "/srv/objectTypeService/",
         "type": "OData",
         "settings": {
           "annotations": [],
           "odataVersion": "4.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "manageObjectTypes": {
+          "semanticObject": "objecttype",
+          "action": "manage",
+          "title": "Manage Object Types",
+          "subTitle": "Configure Code Review object types",
+          "icon": "sap-icon://BusinessSuiteInAppSymbols/icon-object-types",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
         }
       }
     }
@@ -41,6 +56,10 @@
       "tablet": true,
       "phone": true
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "crr.cap.service"
   },
   "sap.ui5": {
     "flexEnabled": true,
@@ -93,17 +112,12 @@
         {
           "pattern": ":?query:",
           "name": "ObjectTypesList",
-          "target": [
-            "ObjectTypesList"
-          ]
+          "target": ["ObjectTypesList"]
         },
         {
           "pattern": "ObjectTypes({key}):?query:",
           "name": "ObjectTypesObjectPage",
-          "target": [
-            "ObjectTypesList",
-            "ObjectTypesObjectPage"
-          ]
+          "target": ["ObjectTypesList", "ObjectTypesObjectPage"]
         }
       ],
       "targets": {

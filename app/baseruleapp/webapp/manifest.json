@@ -17,14 +17,33 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/baseRuleService/",
+        "uri": "/srv/baseRuleService/",
         "type": "OData",
         "settings": {
           "annotations": [],
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "manageBaseRules": {
+          "semanticObject": "coderreviewrule",
+          "action": "manage",
+          "title": "Manage Automated Code Rules",
+          "subTitle": "",
+          "icon": "sap-icon://rules-administration",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "crr.cap.service"
   },
   "sap.ui": {
     "technology": "UI5",
@@ -93,17 +112,12 @@
         {
           "pattern": ":?query:",
           "name": "BaseRulesList",
-          "target": [
-            "BaseRulesList"
-          ]
+          "target": ["BaseRulesList"]
         },
         {
           "pattern": "BaseRules({key}):?query:",
           "name": "BaseRulesObjectPage",
-          "target": [
-            "BaseRulesList",
-            "BaseRulesObjectPage"
-          ]
+          "target": ["BaseRulesList", "BaseRulesObjectPage"]
         }
       ],
       "targets": {
