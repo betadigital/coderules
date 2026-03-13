@@ -49,8 +49,22 @@
       "destination": "sapui5"
     },
     {
-      "source": "^/srv/(.*)$",
-      "target": "/$1",
+      "source": "^/codeRuleService/(.*)$",
+      "target": "/codeRuleService/$1",
+      "destination": "srv-api",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/baseRuleService/(.*)$",
+      "target": "/baseRuleService/$1",
+      "destination": "srv-api",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/objectTypeService/(.*)$",
+      "target": "/objectTypeService/$1",
       "destination": "srv-api",
       "authenticationType": "none",
       "csrfProtection": false
