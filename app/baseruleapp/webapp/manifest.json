@@ -17,7 +17,7 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/srv/baseRuleService/",
+        "uri": "../baseRuleService/",
         "type": "OData",
         "settings": {
           "annotations": [],

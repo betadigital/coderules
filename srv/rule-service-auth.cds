@@ -16,7 +16,6 @@ annotate RuleService.AutomationLogs with @(restrict: [
     {
         grant: ['READ'],
         to   : [
-            'authenticated-user',
             'RuleReader'
         ]
     }
