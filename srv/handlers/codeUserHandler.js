@@ -1,5 +1,5 @@
 const cds = require("@sap/cds");
-const { CodeUse } = cds.entities;
+const { CodeUser } = cds.entities;
 
 class CodeUserHandlers {
   /**
@@ -29,8 +29,8 @@ class CodeUserHandlers {
     const actionVerb = isTrusted ? "trusted" : "untrusted";
 
     try {
-      await cds.run(UPDATE(CodeUse).set({ trusted: isTrusted }).where({ ID }));
-      const updatedUser = await cds.run(SELECT.one.from(CodeUse).where({ ID }));
+      await cds.run(UPDATE(CodeUser).set({ trusted: isTrusted }).where({ ID }));
+      const updatedUser = await cds.run(SELECT.one.from(CodeUser).where({ ID }));
 
       return {
         ...updatedUser,
@@ -51,7 +51,7 @@ class CodeUserHandlers {
   static async onSetTrustedUser(req) {
     const { userId, trusted } = req.data;
     if (!userId) return req.error(400, "User ID is required");
-    await cds.run(UPDATE(CodeUse).set({ trusted }).where({ ID: userId }));
+    await cds.run(UPDATE(CodeUser).set({ trusted }).where({ ID: userId }));
     return "OK";
   }
 }
